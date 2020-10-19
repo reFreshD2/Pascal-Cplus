@@ -13,7 +13,7 @@ public class Pair {
     String type;
     String name;
     
-    void Pair(String t, String n) {
+    Pair(String t, String n) {
         type = t;
         name = n;
     }
