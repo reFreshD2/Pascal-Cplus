@@ -7,8 +7,6 @@ package com.mycompany.mavenproject2;
 
 import java.io.*;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -21,7 +19,7 @@ public class LexAnalyzer {
         "while", "repeat", "until", "if", "then", "else",
         "case", "break", "real", "char", "string",
         "boolean", "abs", "sqr", "sqrt", "exp", "write",
-        "writeln", "readln", "true", "false"
+        "writeln", "readln", "true", "false", "integer"
     };
 
     private final String[] bracket = {
@@ -56,8 +54,10 @@ public class LexAnalyzer {
 
     private void setInput(String fileName) {
         try ( FileReader fr = new FileReader(fileName);  Scanner scan = new Scanner(fr)) {
+            this.input = "";
             while (scan.hasNextLine()) {
-                input = input + scan.nextLine();
+                this.input += scan.nextLine();
+                this.input += ' ';
             }
             fr.close();
         } catch (IOException e) {
@@ -66,70 +66,138 @@ public class LexAnalyzer {
     }
 
     LexAnalyzer(String fileName) {
-        output = new ArrayList();
+        this.output = new ArrayList();
         setInput(fileName);
-        try {
-            makeAnalysis();
-        } catch (Exception ex) {
-            Logger.getLogger(LexAnalyzer.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
-    private void makeAnalysis() throws Exception {
+    public void makeAnalysis() {
         String lexema = new String();
         int i = 0;
-        while (i < input.length()) {
-            // строка
-            if (input.charAt(i) == '"') {
-                lexema += input.charAt(i);
+        while (i < this.input.length()) {
+            lexema += this.input.charAt(i);
+            if (lexema.charAt(0) == '\'') {
                 i++;
-                while (input.charAt(i) == '"') {
-                    lexema += input.charAt(i);
+                while (this.input.charAt(i) != '\'') {
+                    lexema += this.input.charAt(i);
                     i++;
                 }
-                lexema += input.charAt(i);
-                Pair lex = new Pair("string", lexema);
-                output.add(lex);
+                lexema += this.input.charAt(i);
+                if (lexema.length() != 3) { // строка
+                    Pair lex = new Pair("string", lexema);
+                    this.output.add(lex);
+                } else { // символ
+                    Pair lex = new Pair("char", lexema);
+                    this.output.add(lex);
+                }
                 lexema = "";
             }
-            // символ
-            if (input.charAt(i) == '\'') {
-                int j;
-                for (j = i; j < i + 3; j++) {
-                    lexema += input.charAt(i);
-                }
-                i = j;
-                if (lexema.charAt(2) == '\'') {
-                    Pair lex = new Pair("char", lexema);
-                    output.add(lex);
+            // скобка
+            if (find(this.bracket, lexema)) {
+                Pair lex = new Pair("bracket", lexema);
+                this.output.add(lex);
+                lexema = "";
+            }
+            if (find(this.separator, lexema)) {
+                //присваивание
+                if (lexema.charAt(0) == ':' && this.input.charAt(i + 1) == '=') {
+                    i++;
+                    lexema += this.input.charAt(i);
+                    Pair lex = new Pair("assignment", lexema);
+                    this.output.add(lex);
                     lexema = "";
-                } else {
-                    throw new Exception("Wrong lexem");
+                } else { //разделитель
+                    Pair lex = new Pair("separator", lexema);
+                    this.output.add(lex);
+                    lexema = "";
                 }
             }
-            while (input.charAt(i) != ' ' && i < input.length()) {
-                lexema += input.charAt(i);
-                // скобка
-                if (find(bracket, lexema)) {
-                    Pair lex = new Pair("bracket", lexema);
-                    output.add(lex);
+            if (find(this.operator, lexema)) {
+                //присваивание
+                if (this.input.charAt(i + 1) == '=') {
+                    i++;
+                    lexema += this.input.charAt(i);
+                    Pair lex = new Pair("assignment", lexema);
+                    this.output.add(lex);
                     lexema = "";
-                }
-                if (find(separator, lexema)) {
-                    //присваивание
-                    if (lexema.charAt(0) == ':' && input.charAt(i + 1) == '=') {
-                        i++;
-                        lexema += input.charAt(i);
-                        Pair lex = new Pair("assignment", lexema);
-                        output.add(lex);
+                } else {
+                    // операция типа +
+                    if (lexema.charAt(0) == '+' || lexema.charAt(0) == '-') {
+                        Pair lex = new Pair("plus operator", lexema);
+                        this.output.add(lex);
                         lexema = "";
-                    } else { //разделитель
-                        Pair lex = new Pair("separator", lexema);
-                        output.add(lex);
+                    } else { //операция типа *
+                        Pair lex = new Pair("mult operator", lexema);
+                        this.output.add(lex);
                         lexema = "";
                     }
                 }
-                i++;
+            }
+            //сравнение
+            if (find(this.compare, lexema)) {
+                if ((this.input.charAt(i + 1) == '=' && lexema.charAt(0) != '=') || (lexema.charAt(0) == '<' && this.input.charAt(i + 1) == '>')) {
+                    i++;
+                    lexema += this.input.charAt(i);
+                    Pair lex = new Pair("compare", lexema);
+                    this.output.add(lex);
+                    lexema = "";
+                } else {
+                    Pair lex = new Pair("compare", lexema);
+                    this.output.add(lex);
+                    lexema = "";
+                }
+            }
+            //числа
+            if (find(this.num, lexema)) {
+                String nextChar = new String();
+                nextChar += this.input.charAt(i + 1);
+                while (find(this.num, nextChar)) {
+                    i++;
+                    lexema += this.input.charAt(i);
+                    nextChar = "";
+                    nextChar += this.input.charAt(i + 1);
+                }
+                if (nextChar.charAt(0) == '.') {
+                    i++;
+                    lexema += this.input.charAt(i);
+                    nextChar = "";
+                    nextChar += this.input.charAt(i + 1);
+                    while (find(this.num, nextChar)) {
+                        i++;
+                        lexema += this.input.charAt(i);
+                        nextChar = "";
+                        nextChar += this.input.charAt(i + 1);
+                    }
+                    Pair lex = new Pair("real", lexema);
+                    this.output.add(lex);
+                    lexema = "";
+                } else {
+                    Pair lex = new Pair("int", lexema);
+                    this.output.add(lex);
+                    lexema = "";
+                }
+            }
+            if (find(this.charPascal, lexema)) {
+                String nextChar = new String();
+                nextChar += this.input.charAt(i + 1);
+                while (find(this.num, nextChar) || find(this.charPascal, nextChar) || nextChar.charAt(0) == '_') {
+                    i++;
+                    lexema += this.input.charAt(i);
+                    nextChar = "";
+                    nextChar += this.input.charAt(i + 1);
+                }
+                //ключевое слово языка
+                if (find(this.keyWord, lexema)) {
+                    Pair lex = new Pair("keyword", lexema);
+                    this.output.add(lex);
+                    lexema = "";
+                } else { //идентификатор
+                    Pair lex = new Pair("id", lexema);
+                    this.output.add(lex);
+                    lexema = "";
+                }
+            }
+            if (lexema.length() == 1 && lexema.charAt(0) == ' ') {
+                lexema = "";
             }
             i++;
         }
@@ -143,5 +211,11 @@ public class LexAnalyzer {
             }
         }
         return isFind;
+    }
+
+    public void print() {
+        for (int i = 0; i < this.output.size(); i++) {
+            this.output.get(i).print();
+        }
     }
 }
