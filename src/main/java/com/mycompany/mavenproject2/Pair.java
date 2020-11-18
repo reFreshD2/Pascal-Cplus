@@ -5,6 +5,9 @@
  */
 package com.mycompany.mavenproject2;
 
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+
 /**
  *
  * @author refresh.jss
@@ -18,7 +21,8 @@ public class Pair {
         name = n;
     }
     
-    void print() {
-        System.out.println("<"+type+"> "+ name);
+    void print() throws UnsupportedEncodingException {
+        PrintStream ps = new PrintStream(System.out,false,"utf-8");
+        ps.print("( <"+type+"> "+ name + " )");
     }
 }

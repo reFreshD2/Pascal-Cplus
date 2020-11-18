@@ -5,17 +5,20 @@
  */
 package com.mycompany.mavenproject2;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  *
  * @author refresh.jss
  */
 public class Util {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnsupportedEncodingException {
         String pascalFile = "program.txt";
         LexAnalyzer pascal = new LexAnalyzer(pascalFile);
         pascal.makeAnalysis();
-        pascal.print();
-
+        //pascal.print();
+        PascalGrammar pascalGrammar = new PascalGrammar(new Pair("nterm","программа"));
+        pascalGrammar.print();
     }
 }

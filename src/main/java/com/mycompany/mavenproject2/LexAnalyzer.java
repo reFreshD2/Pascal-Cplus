@@ -213,9 +213,12 @@ public class LexAnalyzer {
         return isFind;
     }
 
-    public void print() {
+    public void print() throws UnsupportedEncodingException {
+        
+        PrintStream ps = new PrintStream(System.out,false,"utf-8");
         for (int i = 0; i < this.output.size(); i++) {
             this.output.get(i).print();
+            ps.println();
         }
     }
 }
