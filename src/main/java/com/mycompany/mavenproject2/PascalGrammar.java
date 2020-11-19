@@ -10,8 +10,8 @@ import java.util.ArrayList;
  */
 public class PascalGrammar implements GrammarInterface {
 
-    Pair axiom;
-    ArrayList<Rule> rules;
+    private Pair axiom;
+    private ArrayList<Rule> rules;
 
     PascalGrammar(Pair axiom) {
         this.axiom = axiom;
@@ -403,5 +403,21 @@ public class PascalGrammar implements GrammarInterface {
             this.rules.get(i).print();
             ps.println();
         }
+    }
+    
+    @Override
+    public Pair getAxiom() {
+        return this.axiom;
+    }
+
+    @Override
+    public ArrayList<Rule> getRules(Pair left) {
+        ArrayList<Rule> result = new ArrayList();
+        for (int i = 0; i < this.rules.size(); i++) {
+            if (left.equals(this.rules.get(i).getLeft())) {
+                result.add(this.rules.get(i));
+            }
+        }
+        return result;
     }
 }

@@ -15,10 +15,13 @@ public class Util {
 
     public static void main(String[] args) throws UnsupportedEncodingException {
         String pascalFile = "program.txt";
-        LexAnalyzer pascal = new LexAnalyzer(pascalFile);
-        pascal.makeAnalysis();
-        //pascal.print();
+        LexAnalyzer pascalLexAnal = new LexAnalyzer(pascalFile);
+        pascalLexAnal.makeAnalysis();
+        pascalLexAnal.print();
         PascalGrammar pascalGrammar = new PascalGrammar(new Pair("nterm","программа"));
         pascalGrammar.print();
+        SynAnalyzer pascalSynAnal = new SynAnalyzer(pascalLexAnal.getListLexem(),pascalGrammar);
+        pascalSynAnal.makeAnalysis();
+        pascalSynAnal.printTable();
     }
 }

@@ -13,8 +13,8 @@ import java.io.UnsupportedEncodingException;
  * @author refresh.jss
  */
 public class Pair {
-    String type;
-    String name;
+    private String type;
+    private String name;
     
     Pair(String t, String n) {
         type = t;
@@ -25,4 +25,24 @@ public class Pair {
         PrintStream ps = new PrintStream(System.out,false,"utf-8");
         ps.print("( <"+type+"> "+ name + " )");
     }
+    
+    @Override
+    public boolean equals(Object o) { 
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Pair)) {
+            return false;
+        }
+        Pair c = (Pair) o;
+        boolean eq = false;
+        if (this.type.equals(c.type)) {
+            if (this.name.equals("") || c.name.equals("")) {
+                eq = true;
+            } else if (this.name.equals(c.name)) {
+                eq = true;
+            }
+        }
+        return eq;
+    } 
 }

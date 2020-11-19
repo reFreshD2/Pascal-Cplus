@@ -6,6 +6,7 @@
 package com.mycompany.mavenproject2;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
 
 /**
@@ -19,4 +20,6 @@ public interface GrammarInterface {
      */
     public void fillRules();
     public void print() throws UnsupportedEncodingException;
+    public Pair getAxiom();
+    public ArrayList<Rule> getRules(Pair left);
 }

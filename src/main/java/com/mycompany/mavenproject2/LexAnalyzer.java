@@ -49,8 +49,8 @@ public class LexAnalyzer {
         "+", "-", "*", "/"
     };
 
-    String input;
-    ArrayList<Pair> output;
+    private String input;
+    private ArrayList<Pair> output;
 
     private void setInput(String fileName) {
         try ( FileReader fr = new FileReader(fileName);  Scanner scan = new Scanner(fr)) {
@@ -220,5 +220,9 @@ public class LexAnalyzer {
             this.output.get(i).print();
             ps.println();
         }
+    }
+    
+    public ArrayList<Pair> getListLexem() {
+        return this.output;
     }
 }
