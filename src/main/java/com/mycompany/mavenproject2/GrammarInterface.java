@@ -22,4 +22,5 @@ public interface GrammarInterface {
     public void print() throws UnsupportedEncodingException;
     public Pair getAxiom();
     public ArrayList<Rule> getRules(Pair left);
+    public Rule getRuleByIndex(int index);
 }
