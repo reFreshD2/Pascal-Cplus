@@ -13,12 +13,24 @@ import java.io.UnsupportedEncodingException;
  * @author refresh.jss
  */
 public class Pair {
-    private String type;
-    private String name;
+    private final String type;
+    private final String name;
     
     Pair(String t, String n) {
         type = t;
         name = n;
+    }
+    
+    public Pair copy() {
+        return new Pair(type,name);
+    }
+    
+    public String getType() {
+        return type;
+    }
+    
+    public String getName() {
+        return name;
     }
     
     void print() throws UnsupportedEncodingException {

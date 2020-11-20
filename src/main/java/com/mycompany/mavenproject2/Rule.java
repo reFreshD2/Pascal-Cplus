@@ -88,4 +88,14 @@ class Rule {
     public Pair getPair(int pos) {
         return this.right.get(pos);
     }
+    
+    public Rule copy() {
+        Pair left = this.left.copy();
+        ArrayList<Pair> right = new ArrayList();
+        for (int i = 0; i < this.right.size(); i++) {
+            Pair current = this.right.get(i).copy();
+            right.add(current);
+        }
+        return new Rule(left,right);
+    }
 }

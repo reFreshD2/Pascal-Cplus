@@ -10,8 +10,8 @@ import java.util.ArrayList;
  */
 public class PascalGrammar implements GrammarInterface {
 
-    private Pair axiom;
-    private ArrayList<Rule> rules;
+    private final Pair axiom;
+    private final ArrayList<Rule> rules;
 
     PascalGrammar(Pair axiom) {
         this.axiom = axiom;
@@ -47,7 +47,7 @@ public class PascalGrammar implements GrammarInterface {
         right3.add(new Pair("id", ""));
         right3.add(new Pair("separator", ":"));
         right3.add(new Pair("nterm", "тип"));
-        right3.add(new Pair("assigment", ":="));
+        right3.add(new Pair("assignment", ":="));
         right3.add(new Pair("nterm", "выражение"));
         right3.add(new Pair("separator", ";"));
         right3.add(new Pair("nterm", "раздел описания"));
@@ -66,7 +66,7 @@ public class PascalGrammar implements GrammarInterface {
         right5.add(new Pair("id", ""));
         right5.add(new Pair("separator", ":"));
         right5.add(new Pair("nterm", "тип"));
-        right5.add(new Pair("assigment", ":="));
+        right5.add(new Pair("assignment", ":="));
         right5.add(new Pair("nterm", "выражение"));
         right5.add(new Pair("separator", ";"));
         Rule r6 = new Rule(new Pair("nterm", "раздел описания"), right5);
@@ -221,23 +221,23 @@ public class PascalGrammar implements GrammarInterface {
         Rule r39 = new Rule(new Pair("nterm", "присваивание"), right38);
         this.rules.add(r39);
         ArrayList<Pair> right39 = new ArrayList();
-        right39.add(new Pair("assigment", ":="));
+        right39.add(new Pair("assignment", ":="));
         Rule r40 = new Rule(new Pair("nterm", "знак присваивания"), right39);
         this.rules.add(r40);
         ArrayList<Pair> right40 = new ArrayList();
-        right40.add(new Pair("assigment", "+="));
+        right40.add(new Pair("assignment", "+="));
         Rule r41 = new Rule(new Pair("nterm", "знак присваивания"), right40);
         this.rules.add(r41);
         ArrayList<Pair> right41 = new ArrayList();
-        right41.add(new Pair("assigment", "-="));
+        right41.add(new Pair("assignment", "-="));
         Rule r42 = new Rule(new Pair("nterm", "знак присваивания"), right41);
         this.rules.add(r42);
         ArrayList<Pair> right42 = new ArrayList();
-        right42.add(new Pair("assigment", "/="));
+        right42.add(new Pair("assignment", "/="));
         Rule r43 = new Rule(new Pair("nterm", "знак присваивания"), right42);
         this.rules.add(r43);
         ArrayList<Pair> right43 = new ArrayList();
-        right43.add(new Pair("assigment", "*="));
+        right43.add(new Pair("assignment", "*="));
         Rule r44 = new Rule(new Pair("nterm", "знак присваивания"), right43);
         this.rules.add(r44);
         ArrayList<Pair> right44 = new ArrayList();
@@ -255,7 +255,7 @@ public class PascalGrammar implements GrammarInterface {
         ArrayList<Pair> right47 = new ArrayList();
         right47.add(new Pair("keyword", "for"));
         right47.add(new Pair("id", ""));
-        right47.add(new Pair("assigment", ":="));
+        right47.add(new Pair("assignment", ":="));
         right47.add(new Pair("int", ""));
         right47.add(new Pair("keyword", "to"));
         right47.add(new Pair("int", ""));
@@ -267,7 +267,7 @@ public class PascalGrammar implements GrammarInterface {
         ArrayList<Pair> right48 = new ArrayList();
         right48.add(new Pair("keyword", "for"));
         right48.add(new Pair("id", ""));
-        right48.add(new Pair("assigment", ":="));
+        right48.add(new Pair("assignment", ":="));
         right48.add(new Pair("int", ""));
         right48.add(new Pair("keyword", "downto"));
         right48.add(new Pair("int", ""));
