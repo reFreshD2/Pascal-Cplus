@@ -420,4 +420,12 @@ public class PascalGrammar implements GrammarInterface {
         }
         return result;
     }
+    
+
+    @Override
+    public Rule getRuleByIndex(int index) {
+        if(index < this.rules.size())
+            return this.rules.get(index);
+        else return null;
+    }
 }

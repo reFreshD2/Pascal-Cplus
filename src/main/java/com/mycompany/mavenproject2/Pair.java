@@ -22,7 +22,7 @@ public class Pair {
     }
     
     void print() throws UnsupportedEncodingException {
-        PrintStream ps = new PrintStream(System.out,false,"utf-8");
+        PrintStream ps = new PrintStream(System.out,false,"cp1251");
         ps.print("( <"+type+"> "+ name + " )");
     }
     
@@ -45,4 +45,7 @@ public class Pair {
         }
         return eq;
     } 
+    public String getType(){
+        return this.type;
+    }
 }
