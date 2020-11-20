@@ -14,14 +14,14 @@ import java.io.UnsupportedEncodingException;
 public class Util {
 
     public static void main(String[] args) throws UnsupportedEncodingException {
-        String pascalFile = "program.txt";
+        String pascalFile = "program1.txt";
         LexAnalyzer pascalLexAnal = new LexAnalyzer(pascalFile);
         pascalLexAnal.makeAnalysis();
         pascalLexAnal.print();
         PascalGrammar pascalGrammar = new PascalGrammar(new Pair("nterm","программа"));
         pascalGrammar.print();
         SynAnalyzer pascalSynAnal = new SynAnalyzer(pascalLexAnal.getListLexem(),pascalGrammar);
-        pascalSynAnal.makeAnalysis();
+        pascalSynAnal.makeTable();
         pascalSynAnal.printTable();
     }
 }

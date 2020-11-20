@@ -16,8 +16,8 @@ import java.util.ArrayList;
 public class SynAnalyzer {
 
     private ArrayList<Pair> lexems;
-    private GrammarInterface grammar;
-    private ArrayList<ArrayList<Situation>> table;
+    private final GrammarInterface grammar;
+    private final ArrayList<ArrayList<Situation>> table;
     private final Pair dot = new Pair("$", "");
     private final Pair nterm = new Pair("nterm", "");
 
@@ -28,7 +28,7 @@ public class SynAnalyzer {
         this.grammar = grammar;
     }
 
-    public void makeAnalysis() {
+    public void makeTable() {
         int step = 0;
         ArrayList<Situation> ceil0 = new ArrayList();
         ArrayList<Rule> axiomRules = this.grammar.getRules(this.grammar.getAxiom());
@@ -39,7 +39,7 @@ public class SynAnalyzer {
         while (wasAdding) {
             ArrayList<Situation> situationWithDotInEnd = this.getSituationWithDotInEnd(ceil0, currentIndexEnd);
             if (!situationWithDotInEnd.isEmpty()) {
-                currentIndexEnd += ceil0.size();
+                currentIndexEnd = ceil0.size();
             }
             for (int i = 0; i < situationWithDotInEnd.size(); i++) {
                 Pair left = situationWithDotInEnd.get(i).getRule().getLeft();
@@ -47,7 +47,7 @@ public class SynAnalyzer {
             }
             ArrayList<Situation> situationWithDotAtFrontOfNterm = this.getSituationWithDotAtFrontOfNterm(ceil0, currentIndexNterm);
             if (!situationWithDotAtFrontOfNterm.isEmpty()) {
-                currentIndexNterm += ceil0.size();
+                currentIndexNterm = ceil0.size();
             }
             for (int i = 0; i < situationWithDotAtFrontOfNterm.size(); i++) {
                 int posDot = situationWithDotAtFrontOfNterm.get(i).getRule().getPosSymbol(this.dot);
@@ -59,7 +59,47 @@ public class SynAnalyzer {
                 wasAdding = false;
             }
         }
-        table.add(ceil0);
+        this.table.add(ceil0);
+        step++;
+        while (step <= this.lexems.size()) {
+            ArrayList<Situation> ceil = new ArrayList();
+            ArrayList<Situation> situationWithDotAtFrontOfCurrentTerm = getSituationWithDotAtFrontOf(this.table.get(step - 1), this.lexems.get(step - 1), -1);
+            for (int i = 0; i < situationWithDotAtFrontOfCurrentTerm.size(); i++) {
+                ceil.add(situationWithDotAtFrontOfCurrentTerm.get(i));
+            }
+            wasAdding = true;
+            currentIndexEnd = 0;
+            currentIndexNterm = 0;
+            while (wasAdding) {
+                ArrayList<Situation> situationWithDotInEnd = this.getSituationWithDotInEnd(ceil, currentIndexEnd);
+                if (!situationWithDotInEnd.isEmpty()) {
+                    currentIndexEnd = ceil.size();
+                }
+                for (int i = 0; i < situationWithDotInEnd.size(); i++) {
+                    int index = situationWithDotInEnd.get(i).getPos();
+                    Pair Nterm = situationWithDotInEnd.get(i).getRule().getLeft();
+                    ArrayList<Situation> successMatchSituation = getSituationWithDotAtFrontOf(this.table.get(index), Nterm, -1);
+                    for (int j = 0; j < successMatchSituation.size(); j++) {
+                        ceil.add(successMatchSituation.get(j));
+                    }
+                }
+                ArrayList<Situation> situationWithDotAtFrontOfNterm = this.getSituationWithDotAtFrontOfNterm(ceil, currentIndexNterm);
+                if (!situationWithDotAtFrontOfNterm.isEmpty()) {
+                    currentIndexNterm = ceil.size();
+                }
+                for (int i = 0; i < situationWithDotAtFrontOfNterm.size(); i++) {
+                    int posDot = situationWithDotAtFrontOfNterm.get(i).getRule().getPosSymbol(this.dot);
+                    Pair Nterm = situationWithDotAtFrontOfNterm.get(i).getRule().getPair(posDot + 1);
+                    ArrayList<Rule> possibleRules = this.grammar.getRules(Nterm);
+                    addDefaultRules(ceil, possibleRules, step);
+                }
+                if (situationWithDotInEnd.size() + situationWithDotAtFrontOfNterm.size() == 0) {
+                    wasAdding = false;
+                }
+            }
+            table.add(ceil);
+            step++;
+        }
     }
 
     private void addDefaultRules(ArrayList<Situation> container, ArrayList<Rule> rules, int pos) {
@@ -90,7 +130,27 @@ public class SynAnalyzer {
         for (int i = index; i < current.size(); i++) {
             ArrayList<Pair> rightSideRule = current.get(i).getRule().getRight();
             if (this.dot.equals(rightSideRule.get(rightSideRule.size() - 1))) {
-                result.add(current.get(i));
+                Situation dotInEnd = new Situation(current.get(i).getRule().copy(), current.get(i).getPos());
+                result.add(dotInEnd);
+            }
+        }
+        return result;
+    }
+
+    private ArrayList<Situation> getSituationWithDotAtFrontOf(ArrayList<Situation> current, Pair symbol, int pos) {
+        ArrayList<Situation> result = new ArrayList();
+        for (int i = 0; i < current.size(); i++) {
+            Rule rule = current.get(i).getRule().copy();
+            int posDot = rule.getPosSymbol(this.dot);
+            if ((posDot != -1) && (posDot + 1 < rule.getRight().size()) && symbol.equals(rule.getPair(posDot + 1))) {
+                if (pos != -1) {
+                    Situation success = new Situation(rule.swap(posDot, posDot + 1), pos);
+                    result.add(success);
+                } else {
+                    int currentPos = current.get(i).getPos();
+                    Situation success = new Situation(rule.swap(posDot, posDot + 1), currentPos);
+                    result.add(success);
+                }
             }
         }
         return result;
@@ -98,7 +158,7 @@ public class SynAnalyzer {
 
     private void addSituationWithDotAtFrontOf(ArrayList<Situation> current, Pair symbol, int pos) {
         for (int i = 0; i < current.size(); i++) {
-            Rule rule = current.get(i).getRule();
+            Rule rule = current.get(i).getRule().copy();
             int posDot = rule.getPosSymbol(this.dot);
             if ((posDot != -1) && (posDot + 1 < rule.getRight().size()) && symbol.equals(rule.getPair(posDot + 1))) {
                 Situation success = new Situation(rule.swap(posDot, posDot + 1), pos);
@@ -122,10 +182,11 @@ public class SynAnalyzer {
     private ArrayList<Situation> getSituationWithDotAtFrontOfNterm(ArrayList<Situation> current, int index) {
         ArrayList<Situation> result = new ArrayList();
         for (int i = index; i < current.size(); i++) {
-            Rule rule = current.get(i).getRule();
+            Rule rule = current.get(i).getRule().copy();
             int posDot = rule.getPosSymbol(this.dot);
             if ((posDot != -1) && (posDot + 1 < rule.getRight().size()) && this.nterm.equals(rule.getPair(posDot + 1))) {
-                result.add(current.get(i));
+                Situation dotAtFrontOfNterm = new Situation(rule, current.get(i).getPos());
+                result.add(dotAtFrontOfNterm);
             }
         }
         return result;

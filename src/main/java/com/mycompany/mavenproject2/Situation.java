@@ -14,8 +14,8 @@ import java.util.ArrayList;
  * @author refresh.jss
  */
 public class Situation {
-    private Rule rule;
-    private int pos;
+    private final Rule rule;
+    private final int pos;
     
     Situation(Rule rule, int pos) {
         this.rule = rule;
@@ -23,7 +23,11 @@ public class Situation {
     }
     
     public Rule getRule() {
-        return this.rule;
+        return rule;
+    }
+    
+    public int getPos() {
+        return pos;
     }
     
     public void print() throws UnsupportedEncodingException {
@@ -43,7 +47,7 @@ public class Situation {
         }
         Situation c = (Situation) o;
         boolean eq = true;
-        if (this.rule.getLeft().equals(c.getRule().getLeft())) {
+        if (!this.rule.getLeft().equals(c.getRule().getLeft())) {
             eq = false;
         }
         if (this.rule.getRight().size() != c.getRule().getRight().size()) {
@@ -54,6 +58,7 @@ public class Situation {
             if (!this.rule.getPair(i).equals(c.getRule().getPair(i))) {
                 eq = false;
             }
+            i++;
         }
         return eq;
     } 

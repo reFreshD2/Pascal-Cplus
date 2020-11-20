@@ -50,7 +50,7 @@ public class LexAnalyzer {
     };
 
     private String input;
-    private ArrayList<Pair> output;
+    private final ArrayList<Pair> output;
 
     private void setInput(String fileName) {
         try ( FileReader fr = new FileReader(fileName);  Scanner scan = new Scanner(fr)) {
