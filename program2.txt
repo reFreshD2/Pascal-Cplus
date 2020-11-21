@@ -1,0 +1,4 @@
+var i,var: integer;
+begin
+var:=i+var;
+end.

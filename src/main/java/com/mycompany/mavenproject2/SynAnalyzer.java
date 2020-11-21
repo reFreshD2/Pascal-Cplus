@@ -9,8 +9,6 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-
-
 /**
  *
  * @author refresh.jss
@@ -30,7 +28,7 @@ public class SynAnalyzer {
         this.grammar = grammar;
     }
 
-    public void makeTable() {
+    public void makeTable() throws Exception {
         int step = 0;
         ArrayList<Situation> ceil0 = new ArrayList();
         ArrayList<Rule> axiomRules = this.grammar.getRules(this.grammar.getAxiom());
@@ -65,9 +63,20 @@ public class SynAnalyzer {
         step++;
         while (step <= this.lexems.size()) {
             ArrayList<Situation> ceil = new ArrayList();
-            ArrayList<Situation> situationWithDotAtFrontOfCurrentTerm = getSituationWithDotAtFrontOf(this.table.get(step - 1), this.lexems.get(step - 1), -1);
+            Pair currentLexem = this.lexems.get(step - 1);
+            ArrayList<Situation> situationWithDotAtFrontOfCurrentTerm = getSituationWithDotAtFrontOf(this.table.get(step - 1), currentLexem, -1);
             for (int i = 0; i < situationWithDotAtFrontOfCurrentTerm.size(); i++) {
                 ceil.add(situationWithDotAtFrontOfCurrentTerm.get(i));
+            }
+            if (situationWithDotAtFrontOfCurrentTerm.isEmpty()) {
+                ArrayList<Pair> expected = getTermAtFrontOfDot(this.table.get(step - 1));
+                String expectedString = "{" + expected.get(0).getType();
+                for (int i = 1; i < expected.size(); i++) {
+                    expectedString += ", " + expected.get(i).getType();
+                }
+                expectedString += "}";
+                String error = "Получен " + currentLexem.getType() + " " + currentLexem.getName() + ", а ожидалось " + expectedString;
+                throw new Exception(error);
             }
             wasAdding = true;
             currentIndexEnd = 0;
@@ -102,6 +111,34 @@ public class SynAnalyzer {
             table.add(ceil);
             step++;
         }
+    }
+
+    private ArrayList<Pair> getTermAtFrontOfDot(ArrayList<Situation> container) {
+        ArrayList<Pair> terms = new ArrayList();
+        for (int i = 0; i < container.size(); i++) {
+            Rule rule = container.get(i).getRule();
+            int pos = rule.getPosSymbol(dot);
+            if ((pos != -1) && (pos + 1 < rule.getRight().size())) {
+                Pair current = container.get(i).getRule().getPair(pos + 1);
+                if (!current.getType().equals("nterm") && !isFound(current,terms)) {
+                    terms.add(current);
+                }
+            }
+        }
+        return terms;
+    }
+    
+    private boolean isFound(Pair term, ArrayList<Pair> container) {
+        boolean isFound = false;
+        int i = 0;
+        while (!isFound && (i < container.size())) {
+            if (term.equals(container.get(i))) {
+                isFound = true;
+            } else {
+                i++;
+            }
+        }
+        return isFound;
     }
 
     private void addDefaultRules(ArrayList<Situation> container, ArrayList<Rule> rules, int pos) {
@@ -193,7 +230,7 @@ public class SynAnalyzer {
         }
         return result;
     }
-    
+
     //граматика.гетрулс.гет(номер правила)
 //    вход цепочка: 124125136234413
 //берется 3 - номер правила
@@ -207,47 +244,47 @@ public class SynAnalyzer {
 //	переход к следущему ребенку
 //вернуть к родителю и перейти к шагу 8 пока не корень
 //30,31,6,4,39,16,14,12,38,35,1,0
-    
-    public ParseTree buildTree(ArrayList<Integer> numb_seq){
+    public ParseTree buildTree(ArrayList<Integer> numb_seq) {
         int last_item = numb_seq.size() - 1;
         Rule root_rule = this.grammar.getRuleByIndex(numb_seq.get(last_item));
         ParseTree tree = new ParseTree(root_rule.getLeft());
         walk(tree.getRoot(), numb_seq, last_item);
         return tree;
     }
-    
-    
-    public void walk(TreeItem root, ArrayList<Integer> numb_seq, Integer index ){
-        int num = index;       
+
+    public void walk(TreeItem root, ArrayList<Integer> numb_seq, Integer index) {
+        int num = index;
         Rule cur_rule = this.grammar.getRuleByIndex(numb_seq.get(index));//получаем текущее правило
         //присваеваем правую часть детям текущего узла
         ArrayList<Pair> childs = cur_rule.getRight();
         root.addChilds(childs);
         int cs = childs.size();
-        if(cs > 0 ){
-        int number = childs.size()-1;
-        
-        TreeItem walker = root.getChilds().get(number);
-       // обходит детей текущего узла
-        while(walker != root){
-            if(walker.getVal().getType() == "nterm"){//если нетерминал
-                  num --;
-                  walk(walker, numb_seq, num);
-                  if(number != 0){
-                  number --;
-                  walker = root.getChilds().get(number);
-                  }else walker = walker.getParent();
-                
-            }else if(number >0){
-                number --;
-                walker = root.getChilds().get(number);
-            } else {
-                walker = walker.getParent();
+        if (cs > 0) {
+            int number = childs.size() - 1;
+
+            TreeItem walker = root.getChilds().get(number);
+            // обходит детей текущего узла
+            while (walker != root) {
+                if (walker.getVal().getType() == "nterm") {//если нетерминал
+                    num--;
+                    walk(walker, numb_seq, num);
+                    if (number != 0) {
+                        number--;
+                        walker = root.getChilds().get(number);
+                    } else {
+                        walker = walker.getParent();
+                    }
+
+                } else if (number > 0) {
+                    number--;
+                    walker = root.getChilds().get(number);
+                } else {
+                    walker = walker.getParent();
+                }
             }
         }
-        }
     }
-    
+
 //    public void printTree(TreeItem root) throws UnsupportedEncodingException {
 //        PrintStream ps = new PrintStream(System.out, false, "utf-8");
 //        ArrayList<TreeItem> childs = root.getChilds();
@@ -265,6 +302,4 @@ public class SynAnalyzer {
 //        }
 //        ps.print();
 //    }
-    
-    
 }
