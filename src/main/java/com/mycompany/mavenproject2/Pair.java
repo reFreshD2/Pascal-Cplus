@@ -57,7 +57,6 @@ public class Pair {
         }
         return eq;
     } 
-    public String getType(){
-        return this.type;
-    }
+  
+    
 }
