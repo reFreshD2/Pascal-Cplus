@@ -33,6 +33,7 @@ class Rule {
             ps.print(" ");
         }
     }
+   
     
     public Pair getLeft() {
         return this.left;
@@ -97,5 +98,8 @@ class Rule {
             right.add(current);
         }
         return new Rule(left,right);
+    }
+    public void setRight(ArrayList<Pair> list){
+        this.right = list;
     }
 }

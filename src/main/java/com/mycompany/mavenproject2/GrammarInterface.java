@@ -23,4 +23,5 @@ public interface GrammarInterface {
     public Pair getAxiom();
     public ArrayList<Rule> getRules(Pair left);
     public Rule getRuleByIndex(int index);
+    public int getRuleIndex(Rule rule);
 }

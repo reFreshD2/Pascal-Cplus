@@ -23,6 +23,7 @@ public class Util {
         pascalLexAnal.print();
         PascalGrammar pascalGrammar = new PascalGrammar(new Pair("nterm", "программа"));
         pascalGrammar.print();
+<<<<<<< HEAD
         SynAnalyzer pascalSynAnal = new SynAnalyzer(pascalLexAnal.getListLexem(), pascalGrammar);
         try {
             pascalSynAnal.makeTable();
@@ -32,6 +33,14 @@ public class Util {
             ps.print(e.getMessage());
         }
 
+=======
+        SynAnalyzer pascalSynAnal = new SynAnalyzer(pascalLexAnal.getListLexem(),pascalGrammar);
+        pascalSynAnal.makeTable();
+        pascalSynAnal.printTable();
+        
+        pascalSynAnal.parse();
+        
+>>>>>>> katebekk
         //30,31,6,4,39,16,14,12,38,35,1,0
         ArrayList<Integer> arrInt = new ArrayList<>();
         arrInt.add(30);
