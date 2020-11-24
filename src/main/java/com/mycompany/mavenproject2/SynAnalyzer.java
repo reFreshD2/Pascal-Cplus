@@ -314,22 +314,15 @@ public class SynAnalyzer {
     
     
     public ParseTree buildTree(ArrayList<Integer> numb_seq){
->>>>>>> katebekk
         int last_item = numb_seq.size() - 1;
         Rule root_rule = this.grammar.getRuleByIndex(numb_seq.get(last_item));
         ParseTree tree = new ParseTree(root_rule.getLeft());
         walk(tree.getRoot(), numb_seq, last_item);
         return tree;
     }
-<<<<<<< HEAD
 
-    public void walk(TreeItem root, ArrayList<Integer> numb_seq, Integer index) {
-        int num = index;
-=======
-    
     public void walk(TreeItem root, ArrayList<Integer> numb_seq, Integer index ){
         int num = index;       
->>>>>>> katebekk
         Rule cur_rule = this.grammar.getRuleByIndex(numb_seq.get(index));//получаем текущее правило
         //присваеваем правую часть детям текущего узла
         ArrayList<Pair> childs = cur_rule.getRight();
@@ -337,7 +330,6 @@ public class SynAnalyzer {
         int cs = childs.size();
         if (cs > 0) {
             int number = childs.size() - 1;
-
             TreeItem walker = root.getChilds().get(number);
             // обходит детей текущего узла
             while (walker != root) {
@@ -360,7 +352,6 @@ public class SynAnalyzer {
             }
         }
     }
-<<<<<<< HEAD
 
 //    public void printTree(TreeItem root) throws UnsupportedEncodingException {
 //        PrintStream ps = new PrintStream(System.out, false, "utf-8");
@@ -379,9 +370,4 @@ public class SynAnalyzer {
 //        }
 //        ps.print();
 //    }
-=======
-    
-    
-    
->>>>>>> katebekk
 }

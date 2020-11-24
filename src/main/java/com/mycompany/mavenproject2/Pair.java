@@ -57,9 +57,4 @@ public class Pair {
         }
         return eq;
     } 
-<<<<<<< HEAD
-=======
-  
-    
->>>>>>> katebekk
 }
