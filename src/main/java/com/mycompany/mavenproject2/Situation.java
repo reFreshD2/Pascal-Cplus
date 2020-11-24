@@ -7,38 +7,58 @@ package com.mycompany.mavenproject2;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 
 /**
  *
  * @author refresh.jss
  */
 public class Situation {
+
     private final Rule rule;
     private final int pos;
-    
+    private boolean isProcessedEnd;
+    private boolean isProcessedAtFront;
+
     Situation(Rule rule, int pos) {
         this.rule = rule;
         this.pos = pos;
+        this.isProcessedEnd = false;
+        this.isProcessedAtFront = false;
     }
-    
+
+    public void setIsProcessedEnd(boolean isProcessed) {
+        this.isProcessedEnd = isProcessed;
+    }
+
+    public boolean getIsProcessedEnd() {
+        return this.isProcessedEnd;
+    }
+
+    public void setIsProcessedAtFront(boolean isProcessed) {
+        this.isProcessedAtFront = isProcessed;
+    }
+
+    public boolean getIsProcessedAtFront() {
+        return this.isProcessedAtFront;
+    }
+
     public Rule getRule() {
         return rule;
     }
-    
+
     public int getPos() {
         return pos;
     }
-    
+
     public void print() throws UnsupportedEncodingException {
-        PrintStream ps = new PrintStream(System.out,false,"utf-8");
+        PrintStream ps = new PrintStream(System.out, false, "utf-8");
         ps.print("[");
         rule.print();
-        ps.print(", "+ pos +"]");
+        ps.print(", " + pos + "]");
     }
-    
+
     @Override
-    public boolean equals(Object o) { 
+    public boolean equals(Object o) {
         if (o == this) {
             return true;
         }
@@ -61,5 +81,5 @@ public class Situation {
             i++;
         }
         return eq;
-    } 
+    }
 }

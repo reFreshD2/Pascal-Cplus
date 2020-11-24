@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class Util {
 
     public static void main(String[] args) throws UnsupportedEncodingException, Exception {
-        String pascalFile = "program2.txt";
+        String pascalFile = "program1.txt";
         LexAnalyzer pascalLexAnal = new LexAnalyzer(pascalFile);
         pascalLexAnal.makeAnalysis();
         pascalLexAnal.print();
@@ -27,8 +27,7 @@ public class Util {
         try {
             pascalSynAnal.makeTable();
             pascalSynAnal.printTable();
-			pascalSynAnal.parse();
-			
+	    pascalSynAnal.parse();		
         } catch (Exception e) {
             PrintStream ps = new PrintStream(System.out, false, "utf-8");
             ps.print(e.getMessage());
