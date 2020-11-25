@@ -64,12 +64,12 @@ public class SynAnalyzer {
             }
             if (situationWithDotAtFrontOfCurrentTerm.isEmpty()) {
                 ArrayList<Pair> expected = getTermAtFrontOfDot(this.table.get(step - 1));
-                String expectedString = "{" + expected.get(0).getType();
+                String expectedString = "{<" + expected.get(0).getType() + " " + expected.get(0).getName() + ">";
                 for (int i = 1; i < expected.size(); i++) {
-                    expectedString += ", " + expected.get(i).getType();
+                    expectedString += ", <" + expected.get(i).getType() + " " + expected.get(i).getName() + ">";
                 }
                 expectedString += "}";
-                String error = "Получен " + currentLexem.getType() + " " + currentLexem.getName() + ", а ожидалось " + expectedString;
+                String error = "В строке " + currentLexem.getNumString() + " получен <" + currentLexem.getType() + " " + currentLexem.getName() + ">, а ожидалось " + expectedString;
                 throw new Exception(error);
             }
             wasAdding = true;
