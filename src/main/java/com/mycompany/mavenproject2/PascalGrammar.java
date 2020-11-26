@@ -241,15 +241,15 @@ public class PascalGrammar implements GrammarInterface {
         Rule r44 = new Rule(new Pair("nterm", "знак присваивания"), right43);
         this.rules.add(r44);
         ArrayList<Pair> right44 = new ArrayList();
-        right44.add(new Pair("ntermm", "цикл for"));
+        right44.add(new Pair("nterm", "цикл for"));
         Rule r45 = new Rule(new Pair("nterm", "цикл"), right44);
         this.rules.add(r45);
         ArrayList<Pair> right45 = new ArrayList();
-        right45.add(new Pair("ntermm", "цикл while"));
+        right45.add(new Pair("nterm", "цикл while"));
         Rule r46 = new Rule(new Pair("nterm", "цикл"), right45);
         this.rules.add(r46);
         ArrayList<Pair> right46 = new ArrayList();
-        right46.add(new Pair("ntermm", "цикл repeat"));
+        right46.add(new Pair("nterm", "цикл repeat"));
         Rule r47 = new Rule(new Pair("nterm", "цикл"), right46);
         this.rules.add(r47);
         ArrayList<Pair> right47 = new ArrayList();

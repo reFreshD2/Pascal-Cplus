@@ -1,0 +1,5 @@
+var a,b:integer;
+begun
+a:=51;
+b:=1;
+end.

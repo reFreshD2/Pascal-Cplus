@@ -15,26 +15,38 @@ import java.io.UnsupportedEncodingException;
 public class Pair {
     private final String type;
     private final String name;
+    private final int numString;
     
-    Pair(String t, String n) {
-        type = t;
-        name = n;
+    Pair(String type, String name) {
+        this.type = type;
+        this.name = name;
+        this.numString = 0;
+    }
+    
+    Pair(String type, String name, int numString) {
+        this.type = type;
+        this.name = name;
+        this.numString = numString;
     }
     
     public Pair copy() {
-        return new Pair(type,name);
+        return new Pair(type,name, numString);
+    }
+    
+    public int getNumString() {
+        return this.numString;
     }
     
     public String getType() {
-        return type;
+        return this.type;
     }
     
     public String getName() {
-        return name;
+        return this.name;
     }
     
     void print() throws UnsupportedEncodingException {
-        PrintStream ps = new PrintStream(System.out,false,"cp1251");
+        PrintStream ps = new PrintStream(System.out,false,"utf-8");
         ps.print("( <"+type+"> "+ name + " )");
     }
     
@@ -57,6 +69,4 @@ public class Pair {
         }
         return eq;
     } 
-  
-    
 }

@@ -57,7 +57,7 @@ public class LexAnalyzer {
             this.input = "";
             while (scan.hasNextLine()) {
                 this.input += scan.nextLine();
-                this.input += ' ';
+                this.input += " $ ";
             }
             fr.close();
         } catch (IOException e) {
@@ -73,6 +73,7 @@ public class LexAnalyzer {
     public void makeAnalysis() {
         String lexema = new String();
         int i = 0;
+        int numOfString = 1;
         while (i < this.input.length()) {
             lexema += this.input.charAt(i);
             if (lexema.charAt(0) == '\'') {
@@ -83,17 +84,17 @@ public class LexAnalyzer {
                 }
                 lexema += this.input.charAt(i);
                 if (lexema.length() != 3) { // строка
-                    Pair lex = new Pair("string", lexema);
+                    Pair lex = new Pair("string", lexema, numOfString);
                     this.output.add(lex);
                 } else { // символ
-                    Pair lex = new Pair("char", lexema);
+                    Pair lex = new Pair("char", lexema, numOfString);
                     this.output.add(lex);
                 }
                 lexema = "";
             }
             // скобка
             if (find(this.bracket, lexema)) {
-                Pair lex = new Pair("bracket", lexema);
+                Pair lex = new Pair("bracket", lexema, numOfString);
                 this.output.add(lex);
                 lexema = "";
             }
@@ -102,11 +103,11 @@ public class LexAnalyzer {
                 if (lexema.charAt(0) == ':' && this.input.charAt(i + 1) == '=') {
                     i++;
                     lexema += this.input.charAt(i);
-                    Pair lex = new Pair("assignment", lexema);
+                    Pair lex = new Pair("assignment", lexema, numOfString);
                     this.output.add(lex);
                     lexema = "";
                 } else { //разделитель
-                    Pair lex = new Pair("separator", lexema);
+                    Pair lex = new Pair("separator", lexema, numOfString);
                     this.output.add(lex);
                     lexema = "";
                 }
@@ -116,17 +117,17 @@ public class LexAnalyzer {
                 if (this.input.charAt(i + 1) == '=') {
                     i++;
                     lexema += this.input.charAt(i);
-                    Pair lex = new Pair("assignment", lexema);
+                    Pair lex = new Pair("assignment", lexema, numOfString);
                     this.output.add(lex);
                     lexema = "";
                 } else {
                     // операция типа +
                     if (lexema.charAt(0) == '+' || lexema.charAt(0) == '-') {
-                        Pair lex = new Pair("plus operator", lexema);
+                        Pair lex = new Pair("plus operator", lexema, numOfString);
                         this.output.add(lex);
                         lexema = "";
                     } else { //операция типа *
-                        Pair lex = new Pair("mult operator", lexema);
+                        Pair lex = new Pair("mult operator", lexema, numOfString);
                         this.output.add(lex);
                         lexema = "";
                     }
@@ -137,11 +138,11 @@ public class LexAnalyzer {
                 if ((this.input.charAt(i + 1) == '=' && lexema.charAt(0) != '=') || (lexema.charAt(0) == '<' && this.input.charAt(i + 1) == '>')) {
                     i++;
                     lexema += this.input.charAt(i);
-                    Pair lex = new Pair("compare", lexema);
+                    Pair lex = new Pair("compare", lexema, numOfString);
                     this.output.add(lex);
                     lexema = "";
                 } else {
-                    Pair lex = new Pair("compare", lexema);
+                    Pair lex = new Pair("compare", lexema, numOfString);
                     this.output.add(lex);
                     lexema = "";
                 }
@@ -167,11 +168,11 @@ public class LexAnalyzer {
                         nextChar = "";
                         nextChar += this.input.charAt(i + 1);
                     }
-                    Pair lex = new Pair("real", lexema);
+                    Pair lex = new Pair("real", lexema, numOfString);
                     this.output.add(lex);
                     lexema = "";
                 } else {
-                    Pair lex = new Pair("int", lexema);
+                    Pair lex = new Pair("int", lexema, numOfString);
                     this.output.add(lex);
                     lexema = "";
                 }
@@ -187,16 +188,20 @@ public class LexAnalyzer {
                 }
                 //ключевое слово языка
                 if (find(this.keyWord, lexema)) {
-                    Pair lex = new Pair("keyword", lexema);
+                    Pair lex = new Pair("keyword", lexema, numOfString);
                     this.output.add(lex);
                     lexema = "";
                 } else { //идентификатор
-                    Pair lex = new Pair("id", lexema);
+                    Pair lex = new Pair("id", lexema, numOfString);
                     this.output.add(lex);
                     lexema = "";
                 }
             }
             if (lexema.length() == 1 && lexema.charAt(0) == ' ') {
+                lexema = "";
+            }
+            if (lexema.length() == 1 && lexema.charAt(0) == '$') {
+                numOfString++;
                 lexema = "";
             }
             i++;
@@ -214,14 +219,14 @@ public class LexAnalyzer {
     }
 
     public void print() throws UnsupportedEncodingException {
-        
-        PrintStream ps = new PrintStream(System.out,false,"utf-8");
+
+        PrintStream ps = new PrintStream(System.out, false, "utf-8");
         for (int i = 0; i < this.output.size(); i++) {
             this.output.get(i).print();
             ps.println();
         }
     }
-    
+
     public ArrayList<Pair> getListLexem() {
         return this.output;
     }

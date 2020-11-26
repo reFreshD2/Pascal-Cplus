@@ -9,8 +9,6 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-
-
 /**
  *
  * @author refresh.jss
@@ -32,27 +30,19 @@ public class SynAnalyzer {
         this.parseString = new ArrayList();
     }
 
-    public void makeTable() {
+    public void makeTable() throws Exception {
         int step = 0;
         ArrayList<Situation> ceil0 = new ArrayList();
         ArrayList<Rule> axiomRules = this.grammar.getRules(this.grammar.getAxiom());
         addDefaultRules(ceil0, axiomRules, step);
         boolean wasAdding = true;
-        int currentIndexEnd = 0;
-        int currentIndexNterm = 0;
         while (wasAdding) {
-            ArrayList<Situation> situationWithDotInEnd = this.getSituationWithDotInEnd(ceil0, currentIndexEnd);
-            if (!situationWithDotInEnd.isEmpty()) {
-                currentIndexEnd = ceil0.size();
-            }
+            ArrayList<Situation> situationWithDotInEnd = this.getSituationWithDotInEnd(ceil0);
             for (int i = 0; i < situationWithDotInEnd.size(); i++) {
                 Pair left = situationWithDotInEnd.get(i).getRule().getLeft();
                 this.addSituationWithDotAtFrontOf(ceil0, left, step);
             }
-            ArrayList<Situation> situationWithDotAtFrontOfNterm = this.getSituationWithDotAtFrontOfNterm(ceil0, currentIndexNterm);
-            if (!situationWithDotAtFrontOfNterm.isEmpty()) {
-                currentIndexNterm = ceil0.size();
-            }
+            ArrayList<Situation> situationWithDotAtFrontOfNterm = this.getSituationWithDotAtFrontOfNterm(ceil0);
             for (int i = 0; i < situationWithDotAtFrontOfNterm.size(); i++) {
                 int posDot = situationWithDotAtFrontOfNterm.get(i).getRule().getPosSymbol(this.dot);
                 Pair Nterm = situationWithDotAtFrontOfNterm.get(i).getRule().getPair(posDot + 1);
@@ -67,18 +57,24 @@ public class SynAnalyzer {
         step++;
         while (step <= this.lexems.size()) {
             ArrayList<Situation> ceil = new ArrayList();
-            ArrayList<Situation> situationWithDotAtFrontOfCurrentTerm = getSituationWithDotAtFrontOf(this.table.get(step - 1), this.lexems.get(step - 1), -1);
+            Pair currentLexem = this.lexems.get(step - 1);
+            ArrayList<Situation> situationWithDotAtFrontOfCurrentTerm = getSituationWithDotAtFrontOf(this.table.get(step - 1), currentLexem, -1);
             for (int i = 0; i < situationWithDotAtFrontOfCurrentTerm.size(); i++) {
                 ceil.add(situationWithDotAtFrontOfCurrentTerm.get(i));
             }
-            wasAdding = true;
-            currentIndexEnd = 0;
-            currentIndexNterm = 0;
-            while (wasAdding) {
-                ArrayList<Situation> situationWithDotInEnd = this.getSituationWithDotInEnd(ceil, currentIndexEnd);
-                if (!situationWithDotInEnd.isEmpty()) {
-                    currentIndexEnd = ceil.size();
+            if (situationWithDotAtFrontOfCurrentTerm.isEmpty()) {
+                ArrayList<Pair> expected = getTermAtFrontOfDot(this.table.get(step - 1));
+                String expectedString = "{<" + expected.get(0).getType() + " " + expected.get(0).getName() + ">";
+                for (int i = 1; i < expected.size(); i++) {
+                    expectedString += ", <" + expected.get(i).getType() + " " + expected.get(i).getName() + ">";
                 }
+                expectedString += "}";
+                String error = "В строке " + currentLexem.getNumString() + " получен <" + currentLexem.getType() + " " + currentLexem.getName() + ">, а ожидалось " + expectedString;
+                throw new Exception(error);
+            }
+            wasAdding = true;
+            while (wasAdding) {
+                ArrayList<Situation> situationWithDotInEnd = this.getSituationWithDotInEnd(ceil);
                 for (int i = 0; i < situationWithDotInEnd.size(); i++) {
                     int index = situationWithDotInEnd.get(i).getPos();
                     Pair Nterm = situationWithDotInEnd.get(i).getRule().getLeft();
@@ -87,10 +83,7 @@ public class SynAnalyzer {
                         ceil.add(successMatchSituation.get(j));
                     }
                 }
-                ArrayList<Situation> situationWithDotAtFrontOfNterm = this.getSituationWithDotAtFrontOfNterm(ceil, currentIndexNterm);
-                if (!situationWithDotAtFrontOfNterm.isEmpty()) {
-                    currentIndexNterm = ceil.size();
-                }
+                ArrayList<Situation> situationWithDotAtFrontOfNterm = this.getSituationWithDotAtFrontOfNterm(ceil);
                 for (int i = 0; i < situationWithDotAtFrontOfNterm.size(); i++) {
                     int posDot = situationWithDotAtFrontOfNterm.get(i).getRule().getPosSymbol(this.dot);
                     Pair Nterm = situationWithDotAtFrontOfNterm.get(i).getRule().getPair(posDot + 1);
@@ -104,6 +97,34 @@ public class SynAnalyzer {
             table.add(ceil);
             step++;
         }
+    }
+
+    private ArrayList<Pair> getTermAtFrontOfDot(ArrayList<Situation> container) {
+        ArrayList<Pair> terms = new ArrayList();
+        for (int i = 0; i < container.size(); i++) {
+            Rule rule = container.get(i).getRule();
+            int pos = rule.getPosSymbol(dot);
+            if ((pos != -1) && (pos + 1 < rule.getRight().size())) {
+                Pair current = container.get(i).getRule().getPair(pos + 1);
+                if (!current.getType().equals("nterm") && !isFound(current, terms)) {
+                    terms.add(current);
+                }
+            }
+        }
+        return terms;
+    }
+
+    private boolean isFound(Pair term, ArrayList<Pair> container) {
+        boolean isFound = false;
+        int i = 0;
+        while (!isFound && (i < container.size())) {
+            if (term.equals(container.get(i))) {
+                isFound = true;
+            } else {
+                i++;
+            }
+        }
+        return isFound;
     }
 
     private void addDefaultRules(ArrayList<Situation> container, ArrayList<Rule> rules, int pos) {
@@ -129,13 +150,16 @@ public class SynAnalyzer {
         return isFound;
     }
 
-    private ArrayList<Situation> getSituationWithDotInEnd(ArrayList<Situation> current, int index) {
+    private ArrayList<Situation> getSituationWithDotInEnd(ArrayList<Situation> current) {
         ArrayList<Situation> result = new ArrayList();
-        for (int i = index; i < current.size(); i++) {
-            ArrayList<Pair> rightSideRule = current.get(i).getRule().getRight();
-            if (this.dot.equals(rightSideRule.get(rightSideRule.size() - 1))) {
-                Situation dotInEnd = new Situation(current.get(i).getRule().copy(), current.get(i).getPos());
-                result.add(dotInEnd);
+        for (int i = 0; i < current.size(); i++) {
+            if (!current.get(i).getIsProcessedEnd()) {
+                ArrayList<Pair> rightSideRule = current.get(i).getRule().getRight();
+                if (this.dot.equals(rightSideRule.get(rightSideRule.size() - 1))) {
+                    Situation dotInEnd = new Situation(current.get(i).getRule().copy(), current.get(i).getPos());
+                    result.add(dotInEnd);
+                }
+                current.get(i).setIsProcessedEnd(true);
             }
         }
         return result;
@@ -162,11 +186,14 @@ public class SynAnalyzer {
 
     private void addSituationWithDotAtFrontOf(ArrayList<Situation> current, Pair symbol, int pos) {
         for (int i = 0; i < current.size(); i++) {
-            Rule rule = current.get(i).getRule().copy();
-            int posDot = rule.getPosSymbol(this.dot);
-            if ((posDot != -1) && (posDot + 1 < rule.getRight().size()) && symbol.equals(rule.getPair(posDot + 1))) {
-                Situation success = new Situation(rule.swap(posDot, posDot + 1), pos);
-                current.add(success);
+            if (!current.get(i).getIsProcessedAtFront()) {
+                Rule rule = current.get(i).getRule().copy();
+                int posDot = rule.getPosSymbol(this.dot);
+                if ((posDot != -1) && (posDot + 1 < rule.getRight().size()) && symbol.equals(rule.getPair(posDot + 1))) {
+                    Situation success = new Situation(rule.swap(posDot, posDot + 1), pos);
+                    current.add(success);
+                }
+                current.get(i).setIsProcessedAtFront(true);
             }
         }
     }
@@ -183,120 +210,160 @@ public class SynAnalyzer {
         }
     }
 
-    private ArrayList<Situation> getSituationWithDotAtFrontOfNterm(ArrayList<Situation> current, int index) {
+    private ArrayList<Situation> getSituationWithDotAtFrontOfNterm(ArrayList<Situation> current) {
         ArrayList<Situation> result = new ArrayList();
-        for (int i = index; i < current.size(); i++) {
-            Rule rule = current.get(i).getRule().copy();
-            int posDot = rule.getPosSymbol(this.dot);
-            if ((posDot != -1) && (posDot + 1 < rule.getRight().size()) && this.nterm.equals(rule.getPair(posDot + 1))) {
-                Situation dotAtFrontOfNterm = new Situation(rule, current.get(i).getPos());
-                result.add(dotAtFrontOfNterm);
+        for (int i = 0; i < current.size(); i++) {
+            if (!current.get(i).getIsProcessedAtFront()) {
+                Rule rule = current.get(i).getRule().copy();
+                int posDot = rule.getPosSymbol(this.dot);
+                if ((posDot != -1) && (posDot + 1 < rule.getRight().size()) && this.nterm.equals(rule.getPair(posDot + 1))) {
+                    Situation dotAtFrontOfNterm = new Situation(rule, current.get(i).getPos());
+                    result.add(dotAtFrontOfNterm);
+                }
+                current.get(i).setIsProcessedAtFront(true);
             }
         }
         return result;
     }
-    
-/**
- *
- * @author katebekk
- */  
-    private Rule noDots(Rule rule){
+
+    //граматика.гетрулс.гет(номер правила)
+//    вход цепочка: 124125136234413
+//берется 3 - номер правила
+//граматика.гетрулс.гет(номер правила)
+//структура правила - левая часть - массив(правая часть)
+//TreeItem (Pair) <- левая часть
+//(правая часть.сайз) детей - создать
+//каждому ребенку <- элемент правой части правила
+//идем по детям справа налево
+//	если нетерминал - берем следущее правила и к 3 строке
+//	переход к следущему ребенку
+//вернуть к родителю и перейти к шагу 8 пока не корень
+//30,31,6,4,39,16,14,12,38,35,1,0   
+    /**
+     *
+     * @author katebekk
+     */
+    private Rule noDots(Rule rule) {
         Rule newRule = new Rule(rule.getLeft(), null);
         ArrayList<Pair> right = new ArrayList();
-        for(int i = 0; i < rule.getRight().size(); i++){
-            if(rule.getRight().get(i).getType() != this.dot.getType()){
+        for (int i = 0; i < rule.getRight().size(); i++) {
+            if (rule.getRight().get(i).getType() != this.dot.getType()) {
                 right.add(rule.getRight().get(i));
             }
         }
         newRule.setRight(right);
         return newRule;
     }
-     
-    public void parse(){
+
+    public void parse() {
         int tableSize = this.table.size() - 1;
-        int colSize = this.table.get(tableSize).size() - 1; 
+        int colSize = this.table.get(tableSize).size() - 1;
         //последняя ситуация последнего столбца
         Situation lex = this.table.get(tableSize).get(colSize);
-        procedureR(lex,lexems.size()-1);
+        procedureR(lex, lexems.size() - 1);
     }
-    
-    public void procedureR(Situation situation, Integer j){
+
+    public void procedureR(Situation situation, Integer j) {
         Rule rule = noDots(situation.getRule());
         parseString.add(this.grammar.getRuleIndex(rule));
-        int m = situation.getRule().getRight().size()-1;
+        int m = situation.getRule().getRight().size() - 1;
         int k = m;
         int c = j;
-        while( k != 0 ){
-            if(situation.getRule().getRight().get(k).getType() != "nterm"){
-                k --;
-                c --;
-            }else {
+        while (k != 0) {
+            if (situation.getRule().getRight().get(k).getType() != "nterm") {
+                k--;
+                c--;
+            } else {
                 ArrayList<Situation> sit = new ArrayList();
                 ArrayList<Situation> tableSt = this.table.get(c);//Ik table
                 Pair left = situation.getRule().getRight().get(k);//Xk
                 //находим ситуации в Ik
-                for(int i = 0; i < tableSt.size(); i++ ){
+                for (int i = 0; i < tableSt.size(); i++) {
                     if (left.equals(tableSt.get(i).getRule().getLeft())) {
-                       sit.add(tableSt.get(i));
+                        sit.add(tableSt.get(i));
                     }
                 }
                 //из них выбираем верное
                 int r = 0;
                 Situation rSituation = situation;
+<<<<<<< HEAD
                 for(int i = 0; i < sit.size(); i++ ){
                    if(this.table.get(sit.get(i).getPos()).contains(situation)){
                        rSituation = sit.get(i);
                        r = rSituation.getPos();
                     }  
+=======
+                for (int i = 0; i < sit.size(); i++) {
+                    if (this.table.get(sit.get(i).getPos()).contains(situation)) {
+                        rSituation = sit.get(i);
+                        r = rSituation.getPos();
+                        procedureR(rSituation, c);
+                    }
+>>>>>>> b6fcd2245e798a9fb0648154772e178a261e6829
                 }
                 procedureR(rSituation, c);
-                k --;
+                k--;
                 c = r;
             }
         }
-        
+
     }
-    
-    
-    public ParseTree buildTree(ArrayList<Integer> numb_seq){
+
+    public ParseTree buildTree(ArrayList<Integer> numb_seq) {
         int last_item = numb_seq.size() - 1;
         Rule root_rule = this.grammar.getRuleByIndex(numb_seq.get(last_item));
         ParseTree tree = new ParseTree(root_rule.getLeft());
         walk(tree.getRoot(), numb_seq, last_item);
         return tree;
     }
-    
-    public void walk(TreeItem root, ArrayList<Integer> numb_seq, Integer index ){
-        int num = index;       
+
+    public void walk(TreeItem root, ArrayList<Integer> numb_seq, Integer index) {
+        int num = index;
         Rule cur_rule = this.grammar.getRuleByIndex(numb_seq.get(index));//получаем текущее правило
         //присваеваем правую часть детям текущего узла
         ArrayList<Pair> childs = cur_rule.getRight();
         root.addChilds(childs);
         int cs = childs.size();
-        if(cs > 0 ){
-        int number = childs.size()-1;
-        
-        TreeItem walker = root.getChilds().get(number);
-       // обходит детей текущего узла
-        while(walker != root){
-            if(walker.getVal().getType() == "nterm"){//если нетерминал
-                  num --;
-                  walk(walker, numb_seq, num);
-                  if(number != 0){
-                  number --;
-                  walker = root.getChilds().get(number);
-                  }else walker = walker.getParent();
-                
-            }else if(number >0){
-                number --;
-                walker = root.getChilds().get(number);
-            } else {
-                walker = walker.getParent();
+        if (cs > 0) {
+            int number = childs.size() - 1;
+            TreeItem walker = root.getChilds().get(number);
+            // обходит детей текущего узла
+            while (walker != root) {
+                if (walker.getVal().getType() == "nterm") {//если нетерминал
+                    num--;
+                    walk(walker, numb_seq, num);
+                    if (number != 0) {
+                        number--;
+                        walker = root.getChilds().get(number);
+                    } else {
+                        walker = walker.getParent();
+                    }
+
+                } else if (number > 0) {
+                    number--;
+                    walker = root.getChilds().get(number);
+                } else {
+                    walker = walker.getParent();
+                }
             }
         }
-        }
     }
-    
-    
-    
+
+//    public void printTree(TreeItem root) throws UnsupportedEncodingException {
+//        PrintStream ps = new PrintStream(System.out, false, "utf-8");
+//        ArrayList<TreeItem> childs = root.getChilds();
+//        int number = childs.size()-1;
+//        TreeItem walker = root.getChilds().get(number);
+//       // обходит детей текущего узла
+//        while(walker != root){
+//            if(walker.getVal().getType() == "nterm"){//если нетерминал
+//                  printTree(walker);
+//                
+//            }else if(number >0){
+//                number --;
+//                walker = root.getChilds().get(number);
+//            } else walker = walker.getParent();
+//        }
+//        ps.print();
+//    }
 }
