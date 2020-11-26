@@ -29,9 +29,12 @@ public class Util {
             pascalSynAnal.printTable();
 	    pascalSynAnal.parse();		
         } catch (Exception e) {
-            PrintStream ps = new PrintStream(System.out, false, "utf-8");
+            PrintStream ps = new PrintStream(System.out, false, "cp1251");
             ps.print(e.getMessage());
         }
+        
+       //pascalSynAnal.parse();
+        
         //30,31,6,4,39,16,14,12,38,35,1,0
         ArrayList<Integer> arrInt = new ArrayList<>();
         arrInt.add(30);

@@ -102,4 +102,17 @@ class Rule {
     public void setRight(ArrayList<Pair> list){
         this.right = list;
     }
+    
+    public boolean rightEquals(ArrayList<Pair> pairs) { 
+        boolean r = true;
+        if(this.right.size() == pairs.size()){
+          for(int i = 0; i < pairs.size(); i++){
+             if(pairs.get(i).equals(this.right.get(i)) == false){
+                r = false; 
+             } 
+          }  
+          return r;
+        }else r = false;
+        return r;
+    } 
 }
