@@ -247,8 +247,7 @@ public class SynAnalyzer {
                    if(this.table.get(sit.get(i).getPos()).contains(situation)){
                        rSituation = sit.get(i);
                        r = rSituation.getPos();
-                       procedureR(rSituation, c);
-                   }  
+                    }  
                 }
                 procedureR(rSituation, c);
                 k --;
