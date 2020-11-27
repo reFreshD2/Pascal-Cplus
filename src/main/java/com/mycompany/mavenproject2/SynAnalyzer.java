@@ -245,7 +245,7 @@ public class SynAnalyzer {
         Rule newRule = new Rule(rule.getLeft(), null);
         ArrayList<Pair> right = new ArrayList();
         for (int i = 0; i < rule.getRight().size(); i++) {
-            if (rule.getRight().get(i).getType().equals(this.dot.getType())) {
+            if (!rule.getRight().get(i).getType().equals(this.dot.getType())) {
                 right.add(rule.getRight().get(i));
             }
         }
@@ -286,7 +286,7 @@ public class SynAnalyzer {
         int k = m;
         int c = j;
         while (k >= 0) {
-            if (rule.getRight().get(k).getType().equals("nterm")) {
+            if (!rule.getRight().get(k).getType().equals("nterm")) {
                 k--;
                 c--;
             } else {
