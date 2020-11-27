@@ -314,7 +314,8 @@ public class SynAnalyzer {
 
     public void buildTree() {
         ArrayList<Integer> numb_seq = this.parseString;
-        int last_item = numb_seq.size() - 1;
+//        int last_item = numb_seq.size() - 1;
+        int last_item = 0;
         Rule root_rule = this.grammar.getRuleByIndex(numb_seq.get(last_item));
         ParseTree tree = new ParseTree(root_rule.getLeft());
         walk(tree.getRoot(), numb_seq, last_item);
@@ -334,7 +335,7 @@ public class SynAnalyzer {
             // обходит детей текущего узла
             while (walker != root) {
                 if (walker.getVal().getType() == "nterm") {//если нетерминал
-                    num--;
+                    num++;
                     walk(walker, numb_seq, num);
                     if (number != 0) {
                         number--;
