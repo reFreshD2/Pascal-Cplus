@@ -5,10 +5,8 @@
  */
 package com.mycompany.mavenproject2;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.PrintStream;
-import java.util.ArrayList;
 
 /**
  *
@@ -28,15 +26,11 @@ public class Util {
             pascalSynAnal.makeTable();
             pascalSynAnal.printTable();
 	    pascalSynAnal.parse();
+            pascalSynAnal.printParse();
             pascalSynAnal.buildTree();
         } catch (Exception e) {
-            PrintStream ps = new PrintStream(System.out, false, "cp1251");
+            PrintStream ps = new PrintStream(System.out, false, "utf-8");
             ps.print(e.getMessage());
         }
-        
-        
-        //30,31,6,4,39,16,14,12,38,35,1,0
-       int n = 9;
-       
     }
 }

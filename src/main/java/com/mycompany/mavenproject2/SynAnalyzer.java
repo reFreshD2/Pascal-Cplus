@@ -211,6 +211,15 @@ public class SynAnalyzer {
             }
         }
     }
+    
+    public void printParse() throws UnsupportedEncodingException {
+        PrintStream ps = new PrintStream(System.out, false, "utf-8");
+        for (int i = 0; i < this.parseString.size(); i++) {
+            ps.print(this.parseString.get(i));
+            ps.print(" ");
+        }
+        ps.println();
+    }
 
     private ArrayList<Situation> getSituationWithDotAtFrontOfNterm(ArrayList<Situation> current) {
         ArrayList<Situation> result = new ArrayList();
@@ -233,11 +242,10 @@ public class SynAnalyzer {
      * @author katebekk
      */
     private Rule noDots(Rule rule) {
-
         Rule newRule = new Rule(rule.getLeft(), null);
         ArrayList<Pair> right = new ArrayList();
         for (int i = 0; i < rule.getRight().size(); i++) {
-            if (rule.getRight().get(i).getType() != this.dot.getType()) {
+            if (rule.getRight().get(i).getType().equals(this.dot.getType())) {
                 right.add(rule.getRight().get(i));
             }
         }
@@ -257,19 +265,17 @@ public class SynAnalyzer {
     }
 
     public void parse() {
-
         int tableSize = this.table.size() - 1;
         int colSize = this.table.get(tableSize).size();
         ArrayList<Situation> tbColumn = this.table.get(tableSize);
         //последняя ситуация последнего столбца
         Situation lex = null;
         for (int i = 0; i < colSize; i++) {
-            if (tbColumn.get(i).getRule().getLeft().equals(this.grammar.getAxiom()) && tbColumn.get(i).getRule().getRight().get(tbColumn.get(i).getRule().getRight().size()-1).equals(this.dot)) {
+            if (tbColumn.get(i).getRule().getLeft().equals(this.grammar.getAxiom()) && tbColumn.get(i).getRule().getRight().get(tbColumn.get(i).getRule().getRight().size() - 1).equals(this.dot)) {
                 lex = tbColumn.get(i);
             }
         }
-        
-        procedureR(lex, table.size()-1);
+        procedureR(lex, table.size() - 1);
     }
 
     private void procedureR(Situation situation, int j) {
@@ -280,7 +286,7 @@ public class SynAnalyzer {
         int k = m;
         int c = j;
         while (k >= 0) {
-            if (rule.getRight().get(k).getType() != "nterm") {
+            if (rule.getRight().get(k).getType().equals("nterm")) {
                 k--;
                 c--;
             } else {
@@ -296,14 +302,12 @@ public class SynAnalyzer {
                 }
                 //из них выбираем верное
                 int r = 0;
-
                 Situation rSituation = null;
                 for (int i = 0; i < sit.size(); i++) {
                     if (this.findInTableByColumnAndSit(situation, sit.get(i).getPos(), k) != false) {
                         rSituation = sit.get(i);
                         r = rSituation.getPos();
                     }
-
                 }
                 procedureR(rSituation, c);
                 k--;
@@ -314,7 +318,6 @@ public class SynAnalyzer {
 
     public void buildTree() {
         ArrayList<Integer> numb_seq = this.parseString;
-//        int last_item = numb_seq.size() - 1;
         int last_item = 0;
         Rule root_rule = this.grammar.getRuleByIndex(numb_seq.get(last_item));
         ParseTree tree = new ParseTree(root_rule.getLeft());
@@ -334,7 +337,7 @@ public class SynAnalyzer {
             TreeItem walker = root.getChilds().get(number);
             // обходит детей текущего узла
             while (walker != root) {
-                if (walker.getVal().getType() == "nterm") {//если нетерминал
+                if (walker.getVal().getType().equals("nterm")) {//если нетерминал
                     num++;
                     walk(walker, numb_seq, num);
                     if (number != 0) {
@@ -353,5 +356,4 @@ public class SynAnalyzer {
             }
         }
     }
-
 }
