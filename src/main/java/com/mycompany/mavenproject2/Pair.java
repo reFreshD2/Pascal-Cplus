@@ -16,7 +16,8 @@ public class Pair {
     private final String type;
     private final String name;
     private final int numString;
-    
+    private String contextType = "";
+   
     Pair(String type, String name) {
         this.type = type;
         this.name = name;
@@ -27,6 +28,14 @@ public class Pair {
         this.type = type;
         this.name = name;
         this.numString = numString;
+    }
+    
+    public void setContextType(String type) {
+        this.contextType = type;
+    }
+    
+    public String getContextType() {
+        return this.contextType;
     }
     
     public Pair copy() {

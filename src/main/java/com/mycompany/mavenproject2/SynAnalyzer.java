@@ -356,4 +356,8 @@ public class SynAnalyzer {
             }
         }
     }
+    
+    public ParseTree getTree() {
+        return this.parseTree;
+    }
 }

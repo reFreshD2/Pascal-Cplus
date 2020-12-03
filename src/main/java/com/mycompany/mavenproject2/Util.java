@@ -16,6 +16,7 @@ public class Util {
 
     public static void main(String[] args) throws UnsupportedEncodingException, Exception {
         String pascalFile = "program1.txt";
+        PrintStream ps = new PrintStream(System.out, false, "utf-8");
         LexAnalyzer pascalLexAnal = new LexAnalyzer(pascalFile);
         pascalLexAnal.makeAnalysis();
         pascalLexAnal.print();
@@ -25,11 +26,19 @@ public class Util {
         try {
             pascalSynAnal.makeTable();
             pascalSynAnal.printTable();
-	    pascalSynAnal.parse();
+            pascalSynAnal.parse();
             pascalSynAnal.printParse();
             pascalSynAnal.buildTree();
+            try {
+                SemAnalyzer pascalSemAnal = new SemAnalyzer(pascalSynAnal.getTree());
+                pascalSemAnal.makeAnalysis();
+                if (!pascalSemAnal.hasError()) {
+                    // Трансляция в С++
+                }
+            } catch (Exception e) {
+                ps.print(e.getMessage());
+            }
         } catch (Exception e) {
-            PrintStream ps = new PrintStream(System.out, false, "utf-8");
             ps.print(e.getMessage());
         }
     }

@@ -1,7 +1,5 @@
 package com.mycompany.mavenproject2;
 
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 /**
