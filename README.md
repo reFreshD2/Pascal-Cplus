@@ -19,6 +19,12 @@ src/Pair - класс лексемы - пара <name,value>
   + Pair copy() - возвращает копию объекта Pair
   + boolean equals(Object o) - сравниваем текущую лексему с объектом
   + void print() - метод вывода лексемы на экран
+ 
+ 
+  
+ src/ParseTree - класс дерева - <TreeItem root>
+  + ParseTree(Pair val) - конструктор дерева
+  + TreeItem getRoot() - возвращает TreeItem - корень дерева
   
 src/Rule - класс правило грамматики - <Pair left, ArrayList<Pair> right> === [left -> right]
   + Rule(Pair left, ArrayList<Pair> right) - конструктор правила
@@ -51,6 +57,7 @@ src/SynAnalyzer - класс синтаксического анализатор
   + SynAnalyzer(ArrayList<Pair> lexems, GrammarInterface grammar) - конструктор класса SynAnalyzer
   + void makeTable() - процедура составления таблицы разбора для метода Эрли
   + void printTable() - процедура печати таблицы разбора на экран
+  + void parse() - процедура построения цепочки разбора
   + void buildTree() - процедура посроения дерева разбора
   
 src/Util - класс приложения транслятора Pascal - C++
