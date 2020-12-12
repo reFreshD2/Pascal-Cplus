@@ -321,11 +321,11 @@ public class SynAnalyzer {
         int last_item = 0;
         Rule root_rule = this.grammar.getRuleByIndex(numb_seq.get(last_item));
         ParseTree tree = new ParseTree(root_rule.getLeft());
-        walk(tree.getRoot(), numb_seq, last_item);
+        int n = walk(tree.getRoot(), numb_seq, last_item);
         this.parseTree = tree;
     }
 
-    private void walk(TreeItem root, ArrayList<Integer> numb_seq, Integer index) {
+    private int walk(TreeItem root, ArrayList<Integer> numb_seq, Integer index) {
         int num = index;
         Rule cur_rule = this.grammar.getRuleByIndex(numb_seq.get(index));//получаем текущее правило
         //присваеваем правую часть детям текущего узла
@@ -339,7 +339,8 @@ public class SynAnalyzer {
             while (walker != root) {
                 if (walker.getVal().getType().equals("nterm")) {//если нетерминал
                     num++;
-                    walk(walker, numb_seq, num);
+                    int n = walk(walker, numb_seq, num);
+                    num = n;
                     if (number != 0) {
                         number--;
                         walker = root.getChilds().get(number);
@@ -355,6 +356,7 @@ public class SynAnalyzer {
                 }
             }
         }
+        return num;
     }
     
     public ParseTree getTree() {
