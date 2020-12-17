@@ -15,6 +15,7 @@ import java.util.ArrayList;
  */
 public class SynAnalyzer {
 
+    private int current = 0;
     private ArrayList<Pair> lexems;
     private final GrammarInterface grammar;
     private final ArrayList<ArrayList<Situation>> table;
@@ -320,9 +321,22 @@ public class SynAnalyzer {
         ArrayList<Integer> numb_seq = this.parseString;
         int last_item = 0;
         Rule root_rule = this.grammar.getRuleByIndex(numb_seq.get(last_item));
-        ParseTree tree = new ParseTree(root_rule.getLeft());
+        ParseTree tree = new ParseTree(root_rule.getLeft().copy());
         int n = walk(tree.getRoot(), numb_seq, last_item);
         this.parseTree = tree;
+        recursive(this.parseTree.getRoot());
+    }
+
+    private void recursive(TreeItem elem) {
+        if (elem.getChilds().size() != 0) {
+            ArrayList<TreeItem> childs = elem.getChilds();
+            for (int i = 0; i < childs.size(); i++) {
+                recursive(childs.get(i));
+            }
+        } else {
+            elem.getVal().setAllFields(lexems.get(current));
+            current++;
+        }
     }
 
     private int walk(TreeItem root, ArrayList<Integer> numb_seq, Integer index) {

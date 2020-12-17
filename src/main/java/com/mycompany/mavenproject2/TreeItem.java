@@ -26,7 +26,7 @@ public class TreeItem {
     public void addChilds(ArrayList<Pair> list){
         int childs_numb = list.size();
         for(int i = 0; i < childs_numb; i++){
-            TreeItem newChild = new TreeItem(list.get(i));
+            TreeItem newChild = new TreeItem(list.get(i).copy());
             newChild.setParent(this);
             this.childs.add(i, newChild);
             
@@ -36,12 +36,12 @@ public class TreeItem {
     public ArrayList<TreeItem> getChilds(){
          return this.childs;
     }
+    
     public TreeItem getParent(){
          return this.parent;
     }
+    
     public Pair getVal(){
          return this.val;
     }
-
-    
 }

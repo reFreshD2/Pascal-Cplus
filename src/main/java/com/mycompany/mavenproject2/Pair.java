@@ -13,9 +13,9 @@ import java.io.UnsupportedEncodingException;
  * @author refresh.jss
  */
 public class Pair {
-    private final String type;
-    private final String name;
-    private final int numString;
+    private String type;
+    private String name;
+    private int numString;
     private String contextType = "";
    
     Pair(String type, String name) {
@@ -77,5 +77,12 @@ public class Pair {
             }
         }
         return eq;
-    } 
+    }
+    
+    public void setAllFields(Pair other) {
+        this.name = other.getName();
+        this.numString = other.getNumString();
+        this.type = other.getType();
+        this.contextType = other.getContextType();
+    }
 }

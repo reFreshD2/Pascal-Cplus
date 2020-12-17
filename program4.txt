@@ -1,0 +1,6 @@
+var a,b:integer;
+var s:string;
+var e:real;
+begin
+a:=5;
+end.
