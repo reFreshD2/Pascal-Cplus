@@ -39,7 +39,7 @@ public class SemAnalyzer {
         }
     }
 
-    private void walkBlockVar(ArrayList<TreeItem> blockOfVar) {
+    private void walkBlockVar(ArrayList<TreeItem> blockOfVar) throws Exception {
         int start = 0;
         int end = 0;
         for (int i = 0; i < blockOfVar.size(); i++) {
@@ -62,11 +62,24 @@ public class SemAnalyzer {
                 walkBlockVar(item.getChilds());
             }
             if (item.getVal().getName().equals("выражение")) {
-
+                String typeVar = tableOfName.get(tableOfName.size()-1).getContextType();
+                String typeExpression = execExpression(item.getChilds());
+                if (!typeVar.equals(typeExpression)) {
+                    throw new Exception("Недопустимое преобразование типов переменной "
+                            + tableOfName.get(tableOfName.size()-1).getName()
+                            + " "
+                            + typeVar
+                            + " к "
+                            + typeExpression);
+                }
             }
         }
     }
 
+    private String execExpression(ArrayList<TreeItem> childs) {
+        return "true";
+    }
+    
     private void setListVar(ArrayList<TreeItem> childs) {
         for (int i = 0; i < childs.size(); i++) {
             Pair item = childs.get(i).getVal();
