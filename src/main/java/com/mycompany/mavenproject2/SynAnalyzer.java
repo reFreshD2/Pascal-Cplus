@@ -254,11 +254,14 @@ public class SynAnalyzer {
         return newRule;
     }
 
-    private boolean findInTableByColumnAndSit(Situation situation, int column, int k) {
+    private boolean findInTableByColumnAndSit(Situation situation, int column, Pair k) {
         ArrayList<Situation> tbColumn = this.table.get(column);
         boolean result = false;
+       
         for (int i = 0; i < tbColumn.size(); i++) {
-            if (tbColumn.get(i).getRule().getLeft().equals(situation.getRule().getLeft()) && k < tbColumn.get(i).getRule().getRight().size() && tbColumn.get(i).getRule().getRight().get(k).equals(this.dot)) {
+            Rule rule = tbColumn.get(i).getRule();
+            int posDot =  rule.getPosSymbol(dot)+1;
+            if (rule.getLeft().equals(situation.getRule().getLeft()) && rule.getRight().size() > posDot &&rule.getPair(posDot).equals(k) ) {
                 result = true;
             }
         }
@@ -282,7 +285,7 @@ public class SynAnalyzer {
     private void procedureR(Situation situation, int j) {
         Rule rule = noDots(situation.getRule());
         int rulnum = this.grammar.getRuleIndex(rule);
-        parseString.add(rulnum);
+        this.parseString.add(rulnum);
         int m = rule.getRight().size() - 1;
         int k = m;
         int c = j;
@@ -305,7 +308,7 @@ public class SynAnalyzer {
                 int r = 0;
                 Situation rSituation = null;
                 for (int i = 0; i < sit.size(); i++) {
-                    if (this.findInTableByColumnAndSit(situation, sit.get(i).getPos(), k) != false) {
+                    if (this.findInTableByColumnAndSit(situation, sit.get(i).getPos(), left) != false) {
                         rSituation = sit.get(i);
                         r = rSituation.getPos();
                     }
