@@ -1,6 +1,5 @@
-var a,b:integer;
-var s:string;
-var e:real;
+var a:integer;
+var b:string := 5;
 begin
-a:=5;
+a:=b;
 end.
