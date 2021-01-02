@@ -12,40 +12,42 @@ import java.util.ArrayList;
  * @author refreshjss
  */
 public class PossibleOperationRepository {
+
     private ArrayList<PossibleOperation> operation;
-    
+
     PossibleOperationRepository() {
-        PossibleOperation o1 = new PossibleOperation("+", "integer", "integer", "integer");
+        this.operation = new ArrayList();
+        PossibleOperation o1 = new PossibleOperation("+", "int", "int", "int");
         operation.add(o1);
-        PossibleOperation o2 = new PossibleOperation("*", "integer", "integer", "integer");
+        PossibleOperation o2 = new PossibleOperation("*", "int", "int", "int");
         operation.add(o2);
-        PossibleOperation o3 = new PossibleOperation("/", "integer", "integer", "integer");
+        PossibleOperation o3 = new PossibleOperation("/", "int", "int", "int");
         operation.add(o3);
-        PossibleOperation o4 = new PossibleOperation("-", "integer", "integer", "integer");
+        PossibleOperation o4 = new PossibleOperation("-", "int", "int", "int");
         operation.add(o4);
-        PossibleOperation o5 = new PossibleOperation("+=", "integer", "integer", "integer");
+        PossibleOperation o5 = new PossibleOperation("+=", "int", "int", "int");
         operation.add(o5);
-        PossibleOperation o6 = new PossibleOperation("-=", "integer", "integer", "integer");
+        PossibleOperation o6 = new PossibleOperation("-=", "int", "int", "int");
         operation.add(o6);
-        PossibleOperation o7 = new PossibleOperation("/=", "integer", "integer", "integer");
+        PossibleOperation o7 = new PossibleOperation("/=", "int", "int", "int");
         operation.add(o7);
-        PossibleOperation o8 = new PossibleOperation("*=", "integer", "integer", "integer");
+        PossibleOperation o8 = new PossibleOperation("*=", "int", "int", "int");
         operation.add(o8);
-        PossibleOperation o9 = new PossibleOperation("+", "integer", "real", "real");
+        PossibleOperation o9 = new PossibleOperation("+", "int", "real", "real");
         operation.add(o9);
-        PossibleOperation o10 = new PossibleOperation("*", "integer", "real", "real");
+        PossibleOperation o10 = new PossibleOperation("*", "int", "real", "real");
         operation.add(o10);
-        PossibleOperation o11 = new PossibleOperation("/", "integer", "real", "real");
+        PossibleOperation o11 = new PossibleOperation("/", "int", "real", "real");
         operation.add(o11);
-        PossibleOperation o12 = new PossibleOperation("-", "integer", "real", "real");
+        PossibleOperation o12 = new PossibleOperation("-", "int", "real", "real");
         operation.add(o12);
-        PossibleOperation o13 = new PossibleOperation("+=", "integer", "real", "real");
+        PossibleOperation o13 = new PossibleOperation("+=", "int", "real", "real");
         operation.add(o13);
-        PossibleOperation o14 = new PossibleOperation("-=", "integer", "real", "real");
+        PossibleOperation o14 = new PossibleOperation("-=", "int", "real", "real");
         operation.add(o14);
-        PossibleOperation o15 = new PossibleOperation("/=", "integer", "real", "real");
+        PossibleOperation o15 = new PossibleOperation("/=", "int", "real", "real");
         operation.add(o15);
-        PossibleOperation o16 = new PossibleOperation("*=", "integer", "real", "real");
+        PossibleOperation o16 = new PossibleOperation("*=", "int", "real", "real");
         operation.add(o16);
         PossibleOperation o17 = new PossibleOperation("+", "real", "real", "real");
         operation.add(o17);
@@ -63,13 +65,13 @@ public class PossibleOperationRepository {
         operation.add(o23);
         PossibleOperation o24 = new PossibleOperation("*=", "real", "real", "real");
         operation.add(o24);
-        PossibleOperation o25 = new PossibleOperation("*=", "string", "integer", "string");
+        PossibleOperation o25 = new PossibleOperation("*=", "string", "int", "string");
         operation.add(o24);
-        PossibleOperation o26 = new PossibleOperation("*", "string", "integer", "string");
+        PossibleOperation o26 = new PossibleOperation("*", "string", "int", "string");
         operation.add(o26);
-        PossibleOperation o27 = new PossibleOperation("+=", "string", "integer", "string");
+        PossibleOperation o27 = new PossibleOperation("+=", "string", "int", "string");
         operation.add(o27);
-        PossibleOperation o28 = new PossibleOperation("+", "string", "integer", "string");
+        PossibleOperation o28 = new PossibleOperation("+", "string", "int", "string");
         operation.add(o28);
         PossibleOperation o29 = new PossibleOperation("+=", "string", "string", "string");
         operation.add(o29);
@@ -79,13 +81,13 @@ public class PossibleOperationRepository {
         operation.add(o31);
         PossibleOperation o32 = new PossibleOperation("+", "string", "real", "string");
         operation.add(o32);
-        PossibleOperation o33 = new PossibleOperation("*=", "char", "integer", "string");
+        PossibleOperation o33 = new PossibleOperation("*=", "char", "int", "string");
         operation.add(o33);
-        PossibleOperation o34 = new PossibleOperation("*", "char", "integer", "string");
+        PossibleOperation o34 = new PossibleOperation("*", "char", "int", "string");
         operation.add(o34);
-        PossibleOperation o35 = new PossibleOperation("+=", "char", "integer", "string");
+        PossibleOperation o35 = new PossibleOperation("+=", "char", "int", "string");
         operation.add(o35);
-        PossibleOperation o36 = new PossibleOperation("+", "char", "integer", "string");
+        PossibleOperation o36 = new PossibleOperation("+", "char", "int", "string");
         operation.add(o36);
         PossibleOperation o37 = new PossibleOperation("+=", "char", "string", "string");
         operation.add(o37);
@@ -99,17 +101,17 @@ public class PossibleOperationRepository {
         operation.add(o41);
         PossibleOperation o42 = new PossibleOperation("+", "char", "char", "string");
         operation.add(o42);
-        PossibleOperation o43 = new PossibleOperation("<", "integer", "integer", "boolean");
+        PossibleOperation o43 = new PossibleOperation("<", "int", "int", "boolean");
         operation.add(o42);
-        PossibleOperation o44 = new PossibleOperation(">", "integer", "integer", "boolean");
+        PossibleOperation o44 = new PossibleOperation(">", "int", "int", "boolean");
         operation.add(o44);
-        PossibleOperation o45 = new PossibleOperation("<=", "integer", "integer", "boolean");
+        PossibleOperation o45 = new PossibleOperation("<=", "int", "int", "boolean");
         operation.add(o45);
-        PossibleOperation o46 = new PossibleOperation(">=", "integer", "integer", "boolean");
+        PossibleOperation o46 = new PossibleOperation(">=", "int", "int", "boolean");
         operation.add(o46);
-        PossibleOperation o47 = new PossibleOperation("=", "integer", "integer", "boolean");
+        PossibleOperation o47 = new PossibleOperation("=", "int", "int", "boolean");
         operation.add(o47);
-        PossibleOperation o48 = new PossibleOperation("<>", "integer", "integer", "boolean");
+        PossibleOperation o48 = new PossibleOperation("<>", "int", "int", "boolean");
         operation.add(o48);
         PossibleOperation o49 = new PossibleOperation("<", "real", "real", "boolean");
         operation.add(o49);
@@ -123,17 +125,17 @@ public class PossibleOperationRepository {
         operation.add(o53);
         PossibleOperation o54 = new PossibleOperation("<>", "real", "real", "boolean");
         operation.add(o54);
-        PossibleOperation o55 = new PossibleOperation("<", "integer", "real", "boolean");
+        PossibleOperation o55 = new PossibleOperation("<", "int", "real", "boolean");
         operation.add(o55);
-        PossibleOperation o56 = new PossibleOperation(">", "integer", "real", "boolean");
+        PossibleOperation o56 = new PossibleOperation(">", "int", "real", "boolean");
         operation.add(o56);
-        PossibleOperation o57 = new PossibleOperation("<=", "integer", "real", "boolean");
+        PossibleOperation o57 = new PossibleOperation("<=", "int", "real", "boolean");
         operation.add(o57);
-        PossibleOperation o58 = new PossibleOperation(">=", "integer", "real", "boolean");
+        PossibleOperation o58 = new PossibleOperation(">=", "int", "real", "boolean");
         operation.add(o58);
-        PossibleOperation o59 = new PossibleOperation("=", "integer", "real", "boolean");
+        PossibleOperation o59 = new PossibleOperation("=", "int", "real", "boolean");
         operation.add(o59);
-        PossibleOperation o60 = new PossibleOperation("<>", "integer", "real", "boolean");
+        PossibleOperation o60 = new PossibleOperation("<>", "int", "real", "boolean");
         operation.add(o60);
         PossibleOperation o61 = new PossibleOperation("<", "string", "string", "boolean");
         operation.add(o61);
@@ -171,11 +173,11 @@ public class PossibleOperationRepository {
         operation.add(o77);
         PossibleOperation o78 = new PossibleOperation("<>", "boolean", "boolean", "boolean");
         operation.add(o78);
-        PossibleOperation o79 = new PossibleOperation("abs", "integer", "integer");
+        PossibleOperation o79 = new PossibleOperation("abs", "int", "int");
         operation.add(o79);
         PossibleOperation o80 = new PossibleOperation("abs", "real", "real");
         operation.add(o80);
-        PossibleOperation o81 = new PossibleOperation("sqr", "integer", "integer");
+        PossibleOperation o81 = new PossibleOperation("sqr", "int", "int");
         operation.add(o81);
         PossibleOperation o82 = new PossibleOperation("sqr", "real", "real");
         operation.add(o82);
@@ -184,17 +186,39 @@ public class PossibleOperationRepository {
         PossibleOperation o84 = new PossibleOperation("exp", "real", "real");
         operation.add(o84);
     }
-    
+
     public String getReturnType(String operation, String operandType1, String operandType2) throws Exception {
         PossibleOperation current = new PossibleOperation(operation, operandType1, operandType2, "");
         boolean isFind = false;
         int i = 0;
         while (i < this.operation.size() && !isFind) {
-            if (this.operation.get(i).equals(current))
+            if (this.operation.get(i).equals(current)) {
                 return this.operation.get(i).getReturnType();
-            else 
+            } else {
                 i++;
+            }
         }
-        throw new Exception();
+        throw new Exception("Недопустимая операция "
+                + operation
+                + " с аргументами типа:("
+                + operandType1 + ","
+                + operandType2 + ")");
+    }
+
+    public String getReturnType(String operation, String operandType) throws Exception {
+        PossibleOperation current = new PossibleOperation(operation, operandType, "", "");
+        boolean isFind = false;
+        int i = 0;
+        while (i < this.operation.size() && !isFind) {
+            if (this.operation.get(i).equals(current)) {
+                return this.operation.get(i).getReturnType();
+            } else {
+                i++;
+            }
+        }
+        throw new Exception("Недопустимый вызов функции - "
+                + operation
+                + " с аргументом типа: "
+                + operandType);
     }
 }

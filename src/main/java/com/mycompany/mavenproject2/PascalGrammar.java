@@ -164,18 +164,6 @@ public class PascalGrammar implements GrammarInterface {
         right26.add(new Pair("keyword", "exp"));
         Rule r27 = new Rule(new Pair("nterm", "имя функции"), right26);
         this.rules.add(r27);
-        ArrayList<Pair> right27 = new ArrayList();
-        right27.add(new Pair("keyword", "write"));
-        Rule r28 = new Rule(new Pair("nterm", "имя функции"), right27);
-        this.rules.add(r28);
-        ArrayList<Pair> right28 = new ArrayList();
-        right28.add(new Pair("keyword", "writeln"));
-        Rule r29 = new Rule(new Pair("nterm", "имя функции"), right28);
-        this.rules.add(r29);
-        ArrayList<Pair> right29 = new ArrayList();
-        right29.add(new Pair("keyword", "readln"));
-        Rule r30 = new Rule(new Pair("nterm", "имя функции"), right29);
-        this.rules.add(r30);
         ArrayList<Pair> right30 = new ArrayList();
         right30.add(new Pair("id", ""));
         Rule r31 = new Rule(new Pair("nterm", "список имен"), right30);
@@ -389,6 +377,39 @@ public class PascalGrammar implements GrammarInterface {
         right66.add(new Pair("nterm", "булево"));
         Rule r67 = new Rule(new Pair("nterm", "выбор"), right66);
         this.rules.add(r67);
+        ArrayList<Pair> right27 = new ArrayList();
+        right27.add(new Pair("keyword", "write"));
+        right27.add(new Pair("bracket","("));
+        right27.add(new Pair("nterm","список имен"));
+        right27.add(new Pair("bracket",")"));
+        right27.add(new Pair("separator",";"));
+        Rule r28 = new Rule(new Pair("nterm", "ввод/вывод"), right27);
+        this.rules.add(r28);
+        ArrayList<Pair> right28 = new ArrayList();
+        right28.add(new Pair("keyword", "writeln"));
+        right28.add(new Pair("bracket","("));
+        right28.add(new Pair("nterm","список имен"));
+        right28.add(new Pair("bracket",")"));
+        right28.add(new Pair("separator",";"));
+        Rule r29 = new Rule(new Pair("nterm", "ввод/вывод"), right28);
+        this.rules.add(r29);
+        ArrayList<Pair> right29 = new ArrayList();
+        right29.add(new Pair("keyword", "readln"));
+        right29.add(new Pair("bracket","("));
+        right29.add(new Pair("nterm","список имен"));
+        right29.add(new Pair("bracket",")"));
+        right29.add(new Pair("separator",";"));
+        Rule r30 = new Rule(new Pair("nterm", "ввод/вывод"), right29);
+        this.rules.add(r30);
+        ArrayList<Pair> right67 = new ArrayList();
+        right67.add(new Pair("nterm", "ввод/вывод"));
+        Rule r68 = new Rule(new Pair("nterm", "операторы"), right67);
+        this.rules.add(r68);
+        ArrayList<Pair> right68 = new ArrayList();
+        right68.add(new Pair("nterm", "ввод/вывод"));
+        right68.add(new Pair("nterm", "операторы"));
+        Rule r69 = new Rule(new Pair("nterm", "операторы"), right68);
+        this.rules.add(r69);
     }
 
     @Override

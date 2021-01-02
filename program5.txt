@@ -1,0 +1,4 @@
+var a:real := b+1;
+begin
+writeln(a);
+end.
