@@ -14,18 +14,19 @@ import java.util.ArrayList;
  * @author refresh.jss
  */
 class Rule {
+
     private Pair left;
     private ArrayList<Pair> right;
-    private final Pair dot = new Pair("$","");
-    
+    private final Pair dot = new Pair("$", "");
+
     Rule(Pair left, ArrayList<Pair> right) {
         this.left = left;
         this.right = new ArrayList();
         this.right = right;
     }
-    
+
     public void print() throws UnsupportedEncodingException {
-        PrintStream ps = new PrintStream(System.out,false,"utf-8");
+        PrintStream ps = new PrintStream(System.out, false, "utf-8");
         this.left.print();
         ps.print(" -> ");
         for (int i = 0; i < this.right.size(); i++) {
@@ -33,16 +34,15 @@ class Rule {
             ps.print(" ");
         }
     }
-   
-    
+
     public Pair getLeft() {
         return this.left;
     }
-    
+
     public ArrayList<Pair> getRight() {
         return this.right;
     }
-    
+
     public Rule getRuleWithDot(int pos) {
         ArrayList<Pair> rightWithDot = new ArrayList();
         for (int i = 0; i < pos; i++) {
@@ -54,7 +54,7 @@ class Rule {
         }
         return new Rule(this.left, rightWithDot);
     }
-    
+
     public int getPosSymbol(Pair symbol) {
         boolean isFound = false;
         int i = 0;
@@ -70,7 +70,7 @@ class Rule {
         }
         return i;
     }
-    
+
     public Rule swap(int left, int right) {
         ArrayList<Pair> newRight = new ArrayList();
         for (int i = 0; i < left; i++) {
@@ -85,11 +85,11 @@ class Rule {
         this.right = newRight;
         return this;
     }
-    
+
     public Pair getPair(int pos) {
         return this.right.get(pos);
     }
-    
+
     public Rule copy() {
         Pair left = this.left.copy();
         ArrayList<Pair> right = new ArrayList();
@@ -97,22 +97,25 @@ class Rule {
             Pair current = this.right.get(i).copy();
             right.add(current);
         }
-        return new Rule(left,right);
+        return new Rule(left, right);
     }
-    public void setRight(ArrayList<Pair> list){
+
+    public void setRight(ArrayList<Pair> list) {
         this.right = list;
     }
-    
-    public boolean rightEquals(ArrayList<Pair> pairs) { 
+
+    public boolean rightEquals(ArrayList<Pair> pairs) {
         boolean r = true;
-        if(this.right.size() == pairs.size()){
-          for(int i = 0; i < pairs.size(); i++){
-             if(pairs.get(i).equals(this.right.get(i)) == false){
-                r = false; 
-             } 
-          }  
-          return r;
-        }else r = false;
+        if (this.right.size() == pairs.size()) {
+            for (int i = 0; i < pairs.size(); i++) {
+                if (pairs.get(i).equals(this.right.get(i)) == false) {
+                    r = false;
+                }
+            }
+            return r;
+        } else {
+            r = false;
+        }
         return r;
-    } 
+    }
 }

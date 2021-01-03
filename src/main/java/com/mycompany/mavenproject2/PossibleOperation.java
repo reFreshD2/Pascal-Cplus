@@ -15,27 +15,27 @@ public class PossibleOperation {
     private String typeOfOperand1;
     private String typeOfOperand2;
     private String returnType;
-    
+
     PossibleOperation(String operation, String typeOfOperand, String returnType) {
         this.operation = operation;
         this.typeOfOperand1 = typeOfOperand;
         this.returnType = returnType;
         this.typeOfOperand2 = "";
     }
-    
+
     PossibleOperation(String operation, String typeOfOperand1, String typeOfOperand2, String returnType) {
         this.operation = operation;
         this.typeOfOperand1 = typeOfOperand1;
         this.returnType = returnType;
         this.typeOfOperand2 = typeOfOperand2;
     }
-    
+
     public String getReturnType() {
         return this.returnType;
     }
-    
+
     @Override
-    public boolean equals(Object o) {        
+    public boolean equals(Object o) {
         if (o == this) {
             return true;
         }
@@ -44,12 +44,10 @@ public class PossibleOperation {
         }
         PossibleOperation c = (PossibleOperation) o;
         boolean eq = false;
-        if (this.operation.equals(c.operation) 
-                && 
-                ((this.typeOfOperand1.equals(c.typeOfOperand1) && this.typeOfOperand2.equals(c.typeOfOperand2)) 
-                || 
-                (this.typeOfOperand1.equals(c.typeOfOperand2) && this.typeOfOperand2.equals(c.typeOfOperand1)))) {
-                eq = true;
+        if (this.operation.equals(c.operation)
+                && ((this.typeOfOperand1.equals(c.typeOfOperand1) && this.typeOfOperand2.equals(c.typeOfOperand2))
+                || (this.typeOfOperand1.equals(c.typeOfOperand2) && this.typeOfOperand2.equals(c.typeOfOperand1)))) {
+            eq = true;
         }
         return eq;
     }

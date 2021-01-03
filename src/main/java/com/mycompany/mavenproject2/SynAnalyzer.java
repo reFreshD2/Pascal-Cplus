@@ -212,7 +212,7 @@ public class SynAnalyzer {
             }
         }
     }
-    
+
     public void printParse() throws UnsupportedEncodingException {
         PrintStream ps = new PrintStream(System.out, false, "utf-8");
         for (int i = 0; i < this.parseString.size(); i++) {
@@ -257,11 +257,11 @@ public class SynAnalyzer {
     private boolean findInTableByColumnAndSit(Situation situation, int column, Pair k) {
         ArrayList<Situation> tbColumn = this.table.get(column);
         boolean result = false;
-       
+
         for (int i = 0; i < tbColumn.size(); i++) {
             Rule rule = tbColumn.get(i).getRule();
-            int posDot =  rule.getPosSymbol(dot)+1;
-            if (rule.getLeft().equals(situation.getRule().getLeft()) && rule.getRight().size() > posDot &&rule.getPair(posDot).equals(k) ) {
+            int posDot = rule.getPosSymbol(dot) + 1;
+            if (rule.getLeft().equals(situation.getRule().getLeft()) && rule.getRight().size() > posDot && rule.getPair(posDot).equals(k)) {
                 result = true;
             }
         }
@@ -375,7 +375,7 @@ public class SynAnalyzer {
         }
         return num;
     }
-    
+
     public ParseTree getTree() {
         return this.parseTree;
     }

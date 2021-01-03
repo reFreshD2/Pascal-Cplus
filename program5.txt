@@ -1,4 +1,5 @@
-var a:real := b+1;
+var a:string := 'aa';
+var b:integer;
 begin
 writeln(a);
 end.

@@ -172,7 +172,7 @@ public class LexAnalyzer {
                     this.output.add(lex);
                     lexema = "";
                 } else {
-                    Pair lex = new Pair("int", lexema, numOfString);
+                    Pair lex = new Pair("integer", lexema, numOfString);
                     this.output.add(lex);
                     lexema = "";
                 }

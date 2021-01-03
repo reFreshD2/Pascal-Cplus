@@ -17,6 +17,8 @@ public class SemAnalyzer {
     private ParseTree tree;
     private boolean hasError = false;
     private PossibleOperationRepository repository = new PossibleOperationRepository();
+    private final int COUNT_OF_VARIABLE = 255;
+    private final int MAX_LENGTH_STRING = 255;
 
     SemAnalyzer(ParseTree tree) {
         this.tree = tree;
@@ -26,6 +28,10 @@ public class SemAnalyzer {
     public void makeAnalysis() throws Exception {
         try {
             setTableOfName();
+            if (this.tableOfName.size() > this.COUNT_OF_VARIABLE) {
+                throw new Exception("Недопустимое количество переменных. Максимальное возможное число - 255");
+            }
+            validationString();
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
@@ -65,13 +71,17 @@ public class SemAnalyzer {
             if (item.getVal().getName().equals("выражение")) {
                 String typeVar = tableOfName.get(tableOfName.size() - 1).getContextType();
                 String typeExpression = execExpression(item.getChilds());
-                if (!typeVar.equals(typeExpression)) {
+                if (!((typeVar.equals("real") && typeExpression.equals("integer"))
+                        || (typeVar.equals("string") && typeExpression.equals("char"))
+                        || typeVar.equals(typeExpression))) {
                     throw new Exception("Недопустимое преобразование типов переменной "
                             + tableOfName.get(tableOfName.size() - 1).getName()
-                            + " "
+                            + " - "
                             + typeVar
                             + " к "
                             + typeExpression);
+                } else {
+                    tableOfName.get(tableOfName.size() - 1).setContextValue(collectExpression(item.getChilds()));
                 }
             }
         }
@@ -119,7 +129,7 @@ public class SemAnalyzer {
                     tableOfName.add(item.copy());
                 } else {
                     throw new Exception("Использовано не уникальное имя переменной"
-                    + item.getName());
+                            + item.getName());
                 }
             }
             if (item.getName().equals("список имен")) {
@@ -138,7 +148,7 @@ public class SemAnalyzer {
         return this.hasError;
     }
 
-    public String getTypeOfVariable(String name) throws Exception {
+    private String getTypeOfVariable(String name) throws Exception {
         String type = "";
         int i = 0;
         while (i < this.tableOfName.size() && type.isEmpty()) {
@@ -154,8 +164,8 @@ public class SemAnalyzer {
         }
         return type;
     }
-    
-    public boolean isDuplicate(String name) {
+
+    private boolean isDuplicate(String name) {
         boolean isFind = false;
         int i = 0;
         while (i < this.tableOfName.size() && !isFind) {
@@ -166,5 +176,33 @@ public class SemAnalyzer {
             }
         }
         return isFind;
+    }
+
+    private void validationString() throws Exception {
+        for (Pair elem : this.tableOfName) {
+            if (elem.getContextType().equals("string") && elem.getContextValue().length() > this.MAX_LENGTH_STRING) {
+                throw new Exception("Недопустимая длина строки в переменной "
+                        + elem.getName()
+                        + ". Получена строка длинной "
+                        + elem.getContextValue().length()
+                        + ", а ожидалась < "
+                        + this.MAX_LENGTH_STRING);
+            }
+        }
+    }
+
+    private String collectExpression(ArrayList<TreeItem> childs) {
+        String result = "";
+        int i = 0;
+        while (i < childs.size()) {
+            TreeItem current = childs.get(i);
+            if (current.getChilds().size() > 0) {
+                result += collectExpression(current.getChilds());
+            } else {
+                result += current.getVal().getName();
+            }
+            i++;
+        }
+        return result;
     }
 }

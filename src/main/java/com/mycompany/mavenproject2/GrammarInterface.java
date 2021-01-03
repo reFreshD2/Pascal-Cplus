@@ -8,7 +8,6 @@ package com.mycompany.mavenproject2;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-
 /**
  *
  * @author refresh.jss
@@ -19,9 +18,14 @@ public interface GrammarInterface {
      * Filling grammar by rules
      */
     public void fillRules();
+
     public void print() throws UnsupportedEncodingException;
+
     public Pair getAxiom();
+
     public ArrayList<Rule> getRules(Pair left);
+
     public Rule getRuleByIndex(int index);
+
     public int getRuleIndex(Rule rule);
 }

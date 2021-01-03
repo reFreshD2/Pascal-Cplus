@@ -17,6 +17,7 @@ public class Pair {
     private String name;
     private int numString;
     private String contextType = "";
+    private String contextValue = "";
    
     Pair(String type, String name) {
         this.type = type;
@@ -84,5 +85,13 @@ public class Pair {
         this.numString = other.getNumString();
         this.type = other.getType();
         this.contextType = other.getContextType();
+    }
+    
+    public void setContextValue(String value) {
+        this.contextValue = value;
+    }
+    
+    public String getContextValue() {
+        return this.contextValue;
     }
 }

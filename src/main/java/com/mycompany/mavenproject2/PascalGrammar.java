@@ -122,7 +122,7 @@ public class PascalGrammar implements GrammarInterface {
         Rule r17 = new Rule(new Pair("nterm", "операнд F"), right16);
         this.rules.add(r17);
         ArrayList<Pair> right17 = new ArrayList();
-        right17.add(new Pair("int", ""));
+        right17.add(new Pair("integer", ""));
         Rule r18 = new Rule(new Pair("nterm", "операнд F"), right17);
         this.rules.add(r18);
         ArrayList<Pair> right18 = new ArrayList();
@@ -244,9 +244,9 @@ public class PascalGrammar implements GrammarInterface {
         right47.add(new Pair("keyword", "for"));
         right47.add(new Pair("id", ""));
         right47.add(new Pair("assignment", ":="));
-        right47.add(new Pair("int", ""));
+        right47.add(new Pair("integer", ""));
         right47.add(new Pair("keyword", "to"));
-        right47.add(new Pair("int", ""));
+        right47.add(new Pair("integer", ""));
         right47.add(new Pair("keyword", "do"));
         right47.add(new Pair("nterm", "составной оператор"));
         right47.add(new Pair("separator", ";"));
@@ -256,9 +256,9 @@ public class PascalGrammar implements GrammarInterface {
         right48.add(new Pair("keyword", "for"));
         right48.add(new Pair("id", ""));
         right48.add(new Pair("assignment", ":="));
-        right48.add(new Pair("int", ""));
+        right48.add(new Pair("integer", ""));
         right48.add(new Pair("keyword", "downto"));
-        right48.add(new Pair("int", ""));
+        right48.add(new Pair("integer", ""));
         right48.add(new Pair("keyword", "do"));
         right48.add(new Pair("nterm", "составной оператор"));
         right48.add(new Pair("separator", ";"));
@@ -366,7 +366,7 @@ public class PascalGrammar implements GrammarInterface {
         Rule r64 = new Rule(new Pair("nterm", "выбор"), right63);
         this.rules.add(r64);
         ArrayList<Pair> right64 = new ArrayList();
-        right64.add(new Pair("int", ""));
+        right64.add(new Pair("integer", ""));
         Rule r65 = new Rule(new Pair("nterm", "выбор"), right64);
         this.rules.add(r65);
         ArrayList<Pair> right65 = new ArrayList();
