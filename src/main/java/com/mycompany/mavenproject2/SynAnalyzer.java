@@ -261,7 +261,10 @@ public class SynAnalyzer {
         for (int i = 0; i < tbColumn.size(); i++) {
             Rule rule = tbColumn.get(i).getRule();
             int posDot = rule.getPosSymbol(dot) + 1;
-            if (rule.getLeft().equals(situation.getRule().getLeft()) && rule.getRight().size() > posDot && rule.getPair(posDot).equals(k)) {
+            if (rule.getLeft().equals(situation.getRule().getLeft()) 
+                    && rule.getRight().size() > posDot 
+                    && rule.getPair(posDot).equals(k)
+                    && tbColumn.get(i).getPos() == situation.getPos()) {
                 result = true;
             }
         }

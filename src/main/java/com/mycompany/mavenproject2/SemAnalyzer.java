@@ -5,6 +5,8 @@
  */
 package com.mycompany.mavenproject2;
 
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 /**
@@ -32,6 +34,9 @@ public class SemAnalyzer {
                 throw new Exception("Недопустимое количество переменных. Максимальное возможное число - 255");
             }
             validationString();
+            ArrayList<Pair> scope = new ArrayList();
+            validationBody(this.tree.getRoot().getChilds().get(1).getChilds(), scope);
+            sendWarning();
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
@@ -74,8 +79,10 @@ public class SemAnalyzer {
                 if (!((typeVar.equals("real") && typeExpression.equals("integer"))
                         || (typeVar.equals("string") && typeExpression.equals("char"))
                         || typeVar.equals(typeExpression))) {
-                    throw new Exception("Недопустимое преобразование типов переменной "
+                    throw new Exception("Недопустимое преобразование типов переменной \'"
                             + tableOfName.get(tableOfName.size() - 1).getName()
+                            + "\' в строке "
+                            + tableOfName.get(tableOfName.size() - 1).getNumString()
                             + " - "
                             + typeVar
                             + " к "
@@ -128,8 +135,10 @@ public class SemAnalyzer {
                 if (!isDuplicate(item.getName())) {
                     tableOfName.add(item.copy());
                 } else {
-                    throw new Exception("Использовано не уникальное имя переменной"
-                            + item.getName());
+                    throw new Exception("Использовано не уникальное имя переменной \'"
+                            + item.getName()
+                            + "\' в строке "
+                            + item.getNumString());
                 }
             }
             if (item.getName().equals("список имен")) {
@@ -159,8 +168,9 @@ public class SemAnalyzer {
             }
         }
         if (type.isEmpty()) {
-            throw new Exception("Использована неинициализированная переменная "
-                    + name);
+            throw new Exception("Использована необъявленная переменная \'"
+                    + name
+                    + "\'");
         }
         return type;
     }
@@ -181,9 +191,9 @@ public class SemAnalyzer {
     private void validationString() throws Exception {
         for (Pair elem : this.tableOfName) {
             if (elem.getContextType().equals("string") && elem.getContextValue().length() > this.MAX_LENGTH_STRING) {
-                throw new Exception("Недопустимая длина строки в переменной "
+                throw new Exception("Недопустимая длина строки в переменной \'"
                         + elem.getName()
-                        + ". Получена строка длинной "
+                        + "\'. Получена строка длинной "
                         + elem.getContextValue().length()
                         + ", а ожидалась < "
                         + this.MAX_LENGTH_STRING);
@@ -204,5 +214,49 @@ public class SemAnalyzer {
             i++;
         }
         return result;
+    }
+
+    private void validationBody(ArrayList<TreeItem> childs, ArrayList<Pair> scope) throws Exception {
+        int i = 0;
+        while (i < childs.size()) {
+            TreeItem current = childs.get(i);
+            if (current.getChilds().size() == 0 && current.getVal().getType().equals("id")) {
+                if (isInit(current.getVal())) {
+                    scope.add(current.getVal());
+                } else {
+                    throw new Exception("Использована необъявленная переменная \'"
+                            + current.getVal().getName()
+                            + "\' в строке "
+                            + current.getVal().getNumString());
+                }
+            } else {
+                validationBody(current.getChilds(), scope);
+            }
+        }
+    }
+
+    private boolean isInit(Pair variable) {
+        boolean isFind = false;
+        int i = 0;
+        while (i < this.tableOfName.size() && !isFind) {
+            if (this.tableOfName.get(i).getName().equals(variable.getName())) {
+                isFind = true;
+                this.tableOfName.get(i).setInUse(true);
+            } else {
+                i++;
+            }
+        }
+        return isFind;
+    }
+    
+    private void sendWarning() throws UnsupportedEncodingException {
+        PrintStream ps = new PrintStream(System.out, false, "utf-8");
+        String out = "";
+        for (int i = 0; i < this.tableOfName.size(); i++) {
+            if  (!this.tableOfName.get(i).getInUse()) {
+                out += "\'" + this.tableOfName.get(i).getName() + "\' ";
+            }
+        }
+        ps.println("[Warning] Объявлены неиспользуемые переменные " + out);
     }
 }

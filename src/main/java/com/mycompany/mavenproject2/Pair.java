@@ -18,6 +18,7 @@ public class Pair {
     private int numString;
     private String contextType = "";
     private String contextValue = "";
+    private boolean inUse = false;
    
     Pair(String type, String name) {
         this.type = type;
@@ -40,7 +41,11 @@ public class Pair {
     }
     
     public Pair copy() {
-        return new Pair(type,name, numString);
+        Pair copy = new Pair(this.type, this.name, this.numString);
+        copy.setContextType(this.contextType);
+        copy.setContextValue(this.contextValue);
+        copy.setInUse(this.inUse);
+        return copy;
     }
     
     public int getNumString() {
@@ -93,5 +98,13 @@ public class Pair {
     
     public String getContextValue() {
         return this.contextValue;
+    }
+    
+    public boolean getInUse() {
+        return this.inUse;
+    }
+    
+    public void setInUse(boolean value) {
+        this.inUse = value;
     }
 }
