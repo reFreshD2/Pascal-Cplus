@@ -35,7 +35,7 @@ public class SemAnalyzer {
             }
             validationString();
             ArrayList<Pair> scope = new ArrayList();
-            validationBody(this.tree.getRoot().getChilds().get(1).getChilds(), scope);
+            validationBody(this.tree.getRoot().getChilds().get(1).getChilds().get(1).getChilds(), scope);
             sendWarning();
         } catch (Exception e) {
             throw new Exception(e.getMessage());
@@ -172,6 +172,11 @@ public class SemAnalyzer {
                     + name
                     + "\'");
         }
+        if (this.tableOfName.get(i).getContextValue().isEmpty()) {
+            throw new Exception("Использована непроинициализированная переменная \'"
+                    + name
+                    + "\'");
+        }
         return type;
     }
 
@@ -220,19 +225,94 @@ public class SemAnalyzer {
         int i = 0;
         while (i < childs.size()) {
             TreeItem current = childs.get(i);
-            if (current.getChilds().size() == 0 && current.getVal().getType().equals("id")) {
-                if (isInit(current.getVal())) {
-                    scope.add(current.getVal());
-                } else {
-                    throw new Exception("Использована необъявленная переменная \'"
-                            + current.getVal().getName()
-                            + "\' в строке "
-                            + current.getVal().getNumString());
+            if (current.getChilds().isEmpty()) {
+                if (current.getVal().getName().equals("readln")) {
+                    setUserValue(childs.get(i + 2).getChilds());
+                    i += 2;
+                }
+                switch (current.getVal().getType()) {
+                    case "id" -> {
+                        if (isInit(current.getVal())) {
+                            scope.add(findByName(current.getVal().getName()));
+                        } else {
+                            throw new Exception("Использована необъявленная переменная \'"
+                                    + current.getVal().getName()
+                                    + "\' в строке "
+                                    + current.getVal().getNumString());
+                        }
+                    }
+                    case "assignment" -> {
+                        String typeVar = scope.get(scope.size() - 1).getContextType();
+                        i++;
+                        String typeExpression = execExpression(current.getParent().getParent().getChilds().get(2).getChilds());
+                        if (current.getVal().getName().equals(":=")) {
+                            if (!((typeVar.equals("real") && typeExpression.equals("integer"))
+                                    || (typeVar.equals("string") && typeExpression.equals("char"))
+                                    || typeVar.equals(typeExpression))) {
+                                throw new Exception("Недопустимое преобразование типов переменной \'"
+                                        + scope.get(scope.size() - 1).getName()
+                                        + "\' в строке "
+                                        + scope.get(scope.size() - 1).getNumString()
+                                        + " - "
+                                        + typeVar
+                                        + " к "
+                                        + typeExpression);
+                            } else {
+                                String contextValue = collectExpression(current.getParent().getParent().getChilds().get(2).getChilds());
+                                scope.get(scope.size() - 1).setContextValue(contextValue);
+                                findByName(scope.get(scope.size() - 1).getName()).setContextValue(contextValue);
+                            }
+                        } else {
+                            String operation = current.getVal().getName();
+                            typeExpression = this.repository.getReturnType(operation, typeVar, typeExpression);
+                            if (!((typeVar.equals("real") && typeExpression.equals("integer"))
+                                    || (typeVar.equals("string") && typeExpression.equals("char"))
+                                    || typeVar.equals(typeExpression))) {
+                                throw new Exception("Недопустимое преобразование типов переменной \'"
+                                        + scope.get(scope.size() - 1).getName()
+                                        + "\' в строке "
+                                        + scope.get(scope.size() - 1).getNumString()
+                                        + " - "
+                                        + typeVar
+                                        + " к "
+                                        + typeExpression);
+                            } else {
+                                String contextValue = scope.get(scope.size() - 1).getContextValue()
+                                        + current.getVal().getName().substring(0, 1)
+                                        + collectExpression(current.getParent().getParent().getChilds().get(2).getChilds());
+                                scope.get(scope.size() - 1).setContextValue(contextValue);
+                                findByName(scope.get(scope.size() - 1).getName()).setContextValue(contextValue);
+                            }
+                        }
+                    }
+                    case "compare" -> {
+                        String operation = current.getVal().getName();
+                        String operandType1 = execExpression(childs.get(i - 1).getChilds());
+                        String operandType2 = execExpression(childs.get(i + 1).getChilds());
+                        this.repository.getReturnType(operation, operandType1, operandType2);
+                        i++;
+                    }
                 }
             } else {
                 validationBody(current.getChilds(), scope);
             }
+            i++;
         }
+    }
+
+    private Pair findByName(String name) {
+        boolean isFind = false;
+        int i = 0;
+        Pair result = null;
+        while (i < this.tableOfName.size() && !isFind) {
+            if (this.tableOfName.get(i).getName().equals(name)) {
+                result = this.tableOfName.get(i);
+                isFind = true;
+            } else {
+                i++;
+            }
+        }
+        return result;
     }
 
     private boolean isInit(Pair variable) {
@@ -248,15 +328,31 @@ public class SemAnalyzer {
         }
         return isFind;
     }
-    
+
     private void sendWarning() throws UnsupportedEncodingException {
         PrintStream ps = new PrintStream(System.out, false, "utf-8");
         String out = "";
         for (int i = 0; i < this.tableOfName.size(); i++) {
-            if  (!this.tableOfName.get(i).getInUse()) {
+            if (!this.tableOfName.get(i).getInUse()) {
                 out += "\'" + this.tableOfName.get(i).getName() + "\' ";
             }
         }
-        ps.println("[Warning] Объявлены неиспользуемые переменные " + out);
+        if (!out.isEmpty()) {
+            ps.println("[Warning] Объявлены неиспользуемые переменные " + out);
+        }
+    }
+
+    private void setUserValue(ArrayList<TreeItem> childs) {
+        int i = 0;
+        while (i < childs.size()) {
+            TreeItem current = childs.get(i);
+            switch (current.getVal().getType()) {
+                case "id" ->
+                    findByName(current.getVal().getName()).setContextValue("user_value");
+                default ->
+                    setUserValue(current.getChilds());
+            }
+            i++;
+        }
     }
 }
