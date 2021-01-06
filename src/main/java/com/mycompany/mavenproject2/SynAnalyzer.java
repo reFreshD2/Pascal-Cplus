@@ -382,4 +382,8 @@ public class SynAnalyzer {
     public ParseTree getTree() {
         return this.parseTree;
     }
+    
+    public ArrayList<Integer> getParse() {
+        return this.parseString;
+    }
 }

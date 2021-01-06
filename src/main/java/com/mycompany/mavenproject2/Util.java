@@ -22,7 +22,8 @@ public class Util {
         pascalLexAnal.print();
         PascalGrammar pascalGrammar = new PascalGrammar(new Pair("nterm", "программа"));
         pascalGrammar.print();
-        SynAnalyzer pascalSynAnal = new SynAnalyzer(pascalLexAnal.getListLexem(), pascalGrammar);
+        SynAnalyzer pascalSynAnal = new SynAnalyzer(pascalLexAnal.getListLexem(),
+                pascalGrammar);
         try {
             pascalSynAnal.makeTable();
             pascalSynAnal.printTable();
@@ -33,7 +34,13 @@ public class Util {
                 SemAnalyzer pascalSemAnal = new SemAnalyzer(pascalSynAnal.getTree());
                 pascalSemAnal.makeAnalysis();
                 if (!pascalSemAnal.hasError()) {
-                    // Трансляция в С++
+                    CGrammar cGrammar = new CGrammar(new Pair("nterm", "программа"));
+                    cGrammar.print();
+                    Translator pascalToC = new Translator(cGrammar,
+                            pascalSynAnal.getParse(),
+                            pascalLexAnal.getListLexem());
+                    
+                    while(true){}
                 }
             } catch (Exception e) {
                 ps.print(e.getMessage());
