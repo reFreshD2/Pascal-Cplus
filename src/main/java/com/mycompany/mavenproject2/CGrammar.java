@@ -404,7 +404,7 @@ public class CGrammar implements GrammarInterface {
         right66.add(new Pair("keyword", ">>"));
         right66.add(new Pair("nterm","список имен"));
         right66.add(new Pair("separator",";"));
-        Rule r66 = new Rule(new Pair("nterm", "ввод/вывод"), right6);
+        Rule r66 = new Rule(new Pair("nterm", "ввод/вывод"), right66);
         this.rules.add(r66);
         ArrayList<Pair> right67 = new ArrayList();
         right67.add(new Pair("nterm", "ввод/вывод"));
