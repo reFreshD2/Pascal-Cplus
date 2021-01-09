@@ -244,7 +244,12 @@ public class SemAnalyzer {
                     case "assignment" -> {
                         String typeVar = scope.get(scope.size() - 1).getContextType();
                         i++;
-                        String typeExpression = execExpression(current.getParent().getParent().getChilds().get(2).getChilds());
+                        String typeExpression = "";
+                        if (current.getParent().getVal().getName().equals("знак присваивания")) {
+                            typeExpression = execExpression(current.getParent().getParent().getChilds().get(2).getChilds());
+                        } else {
+                            typeExpression = current.getParent().getChilds().get(3).getVal().getType();
+                        }
                         if (current.getVal().getName().equals(":=")) {
                             if (!((typeVar.equals("real") && typeExpression.equals("integer"))
                                     || (typeVar.equals("string") && typeExpression.equals("char"))
@@ -258,7 +263,12 @@ public class SemAnalyzer {
                                         + " к "
                                         + typeExpression);
                             } else {
-                                String contextValue = collectExpression(current.getParent().getParent().getChilds().get(2).getChilds());
+                                String contextValue = "";
+                                if (current.getParent().getVal().getName().equals("знак присваивания")) {
+                                    contextValue = collectExpression(current.getParent().getParent().getChilds().get(2).getChilds());
+                                } else {
+                                    contextValue = current.getParent().getChilds().get(3).getVal().getName();
+                                }
                                 scope.get(scope.size() - 1).setContextValue(contextValue);
                                 findByName(scope.get(scope.size() - 1).getName()).setContextValue(contextValue);
                             }
