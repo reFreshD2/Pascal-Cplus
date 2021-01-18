@@ -70,7 +70,7 @@ public class LexAnalyzer {
         setInput(fileName);
     }
 
-    public void makeAnalysis() {
+    public void makeAnalysis() throws Exception {
         String lexema = new String();
         int i = 0;
         int numOfString = 1;
@@ -203,6 +203,11 @@ public class LexAnalyzer {
             if (lexema.length() == 1 && lexema.charAt(0) == '$') {
                 numOfString++;
                 lexema = "";
+            }
+            if (lexema.length() == 1) {
+                throw new Exception("Недопустимый символ грамматики \'"
+                        + lexema.charAt(0)
+                        + "\'");
             }
             i++;
         }

@@ -100,21 +100,33 @@ public class SemAnalyzer {
             String operation = childs.get(1).getVal().getName();
             String operand1 = execExpression(childs.get(0).getChilds());
             String operand2 = execExpression(childs.get(2).getChilds());
-            return this.repository.getReturnType(operation, operand1, operand2);
+            try {
+                return this.repository.getReturnType(operation, operand1, operand2);
+            } catch (Exception e) {
+                throw new Exception(e.getMessage()
+                        + " в строке "
+                        + childs.get(1).getVal().getNumString());
+            }
         }
         if ((parent.equals("выражение") || parent.equals("операнд T")) && childs.size() == 1) {
             return execExpression(childs.get(0).getChilds());
         }
         if (parent.equals("операнд F") && childs.size() == 1) {
             Pair atom = childs.get(0).getVal();
-            return switch (atom.getType()) {
-                case "nterm" ->
-                    "boolean";
-                case "id" ->
-                    getTypeOfVariable(atom.getName());
-                default ->
-                    atom.getType();
-            };
+            try {
+                return switch (atom.getType()) {
+                    case "nterm" ->
+                        "boolean";
+                    case "id" ->
+                        getTypeOfVariable(atom.getName());
+                    default ->
+                        atom.getType();
+                };
+            } catch (Exception e) {
+                throw new Exception(e.getMessage()
+                        + " в строке "
+                        + atom.getNumString());
+            }
         }
         if (parent.equals("операнд F") && childs.size() > 1) {
             if (childs.get(0).getVal().getType().equals("bracket")) {
@@ -122,7 +134,13 @@ public class SemAnalyzer {
             } else {
                 String operation = childs.get(0).getChilds().get(0).getVal().getName();
                 String opearand = execExpression(childs.get(2).getChilds());
-                return this.repository.getReturnType(operation, opearand);
+                try {
+                    return this.repository.getReturnType(operation, opearand);
+                } catch (Exception e) {
+                    throw new Exception(e.getMessage()
+                            + " в строке "
+                            + childs.get(0).getChilds().get(0).getVal().getNumString());
+                }
             }
         }
         return "true";
@@ -170,7 +188,8 @@ public class SemAnalyzer {
         if (type.isEmpty()) {
             throw new Exception("Использована необъявленная переменная \'"
                     + name
-                    + "\'");
+                    + "\'"
+            );
         }
         if (this.tableOfName.get(i).getContextValue().isEmpty()) {
             throw new Exception("Использована непроинициализированная переменная \'"
@@ -198,7 +217,9 @@ public class SemAnalyzer {
             if (elem.getContextType().equals("string") && elem.getContextValue().length() > this.MAX_LENGTH_STRING) {
                 throw new Exception("Недопустимая длина строки в переменной \'"
                         + elem.getName()
-                        + "\'. Получена строка длинной "
+                        + "\' в строке "
+                        + elem.getNumString()
+                        + ". Получена строка длинной "
                         + elem.getContextValue().length()
                         + ", а ожидалась < "
                         + this.MAX_LENGTH_STRING);
@@ -234,6 +255,7 @@ public class SemAnalyzer {
                     case "id" -> {
                         if (isInit(current.getVal())) {
                             scope.add(findByName(current.getVal().getName()));
+                            scope.get(scope.size() - 1).setNumString(current.getVal().getNumString());
                         } else {
                             throw new Exception("Использована необъявленная переменная \'"
                                     + current.getVal().getName()
@@ -274,7 +296,13 @@ public class SemAnalyzer {
                             }
                         } else {
                             String operation = current.getVal().getName();
-                            typeExpression = this.repository.getReturnType(operation, typeVar, typeExpression);
+                            try {
+                                typeExpression = this.repository.getReturnType(operation, typeVar, typeExpression);
+                            } catch (Exception e) {
+                                throw new Exception(e.getMessage()
+                                        + " в строке "
+                                        + current.getVal().getNumString());
+                            }
                             if (!((typeVar.equals("real") && typeExpression.equals("integer"))
                                     || (typeVar.equals("string") && typeExpression.equals("char"))
                                     || typeVar.equals(typeExpression))) {
@@ -299,7 +327,13 @@ public class SemAnalyzer {
                         String operation = current.getVal().getName();
                         String operandType1 = execExpression(childs.get(i - 1).getChilds());
                         String operandType2 = execExpression(childs.get(i + 1).getChilds());
-                        this.repository.getReturnType(operation, operandType1, operandType2);
+                        try {
+                            this.repository.getReturnType(operation, operandType1, operandType2);
+                        } catch (Exception e) {
+                            throw new Exception(e.getMessage()
+                                    + " в строке "
+                                    + current.getVal().getNumString());
+                        }
                         i++;
                     }
                 }

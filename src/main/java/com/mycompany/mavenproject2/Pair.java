@@ -121,4 +121,8 @@ public class Pair {
     public void setInUse(boolean value) {
         this.inUse = value;
     }
+    
+    public void setNumString(int value) {
+        this.numString = value;
+    }
 }
