@@ -207,7 +207,8 @@ public class LexAnalyzer {
             if (lexema.length() == 1) {
                 throw new Exception("Недопустимый символ грамматики \'"
                         + lexema.charAt(0)
-                        + "\'");
+                        + "\' в строке "
+                        + numOfString);
             }
             i++;
         }

@@ -373,12 +373,16 @@ public class SemAnalyzer {
         return isFind;
     }
 
-    private void sendWarning() throws UnsupportedEncodingException {
+    private void sendWarning() throws UnsupportedEncodingException, Exception {
         PrintStream ps = new PrintStream(System.out, false, "utf-8");
         String out = "";
         for (int i = 0; i < this.tableOfName.size(); i++) {
             if (!this.tableOfName.get(i).getInUse()) {
                 out += "\'" + this.tableOfName.get(i).getName() + "\' ";
+                deleteVar(
+                        this.tableOfName.get(i),
+                        this.tree.getRoot().getChilds().get(0).getChilds()
+                );
             }
         }
         if (!out.isEmpty()) {
@@ -397,6 +401,64 @@ public class SemAnalyzer {
                     setUserValue(current.getChilds());
             }
             i++;
+        }
+    }
+
+    private boolean deleteVar(Pair var, ArrayList<TreeItem> varList) throws Exception {
+        boolean success = false;
+        int i = 0;
+        while (!success && i < varList.size()) {
+            if (varList.get(i).getVal().getName().equals("раздел описания")) {
+                success = deleteVar(var, varList.get(i).getChilds());;
+            }
+            if (varList.get(i).getVal().getName().equals("список имен")) {
+                success = deleteVar(var, varList.get(i).getChilds());;
+            }
+            if (varList.get(i).getVal().equals(var)) {
+                success = true;
+                TreeItem parent = varList.get(i).getParent();
+                if (parent.getVal().getName().equals("список имен")) {
+                    if (parent.getChilds().size() > 1) {
+                        if (i != parent.getChilds().size() - 1) {
+                            varList.remove(i + 1);
+                        }
+                        varList.remove(i);
+                    } else {
+                        TreeItem grandgrandparent = parent.getParent().getParent(); //подумать над логикой
+                        TreeItem lastItem = grandgrandparent.getChilds().get(grandgrandparent.getChilds().size()-1);
+                        if (lastItem.getVal().getName().equals("раздел описания")) {
+                            parent.setChilds(lastItem.getChilds());
+                        } else {
+                            parent.getParent().getChilds().remove(parent);
+                        }
+                    }
+                }
+                if (parent.getVal().getName().equals("раздел описания")) {
+                    TreeItem lastItem = varList.get(varList.size() - 1);
+                    if (lastItem.getVal().getName().equals("раздел описания")) {
+                        parent.setChilds(lastItem.getChilds());
+                    } else {
+                        TreeItem grandparent = parent.getParent();
+                        if (grandparent.getVal().getName().equals("программа")
+                                && grandparent.getChilds().size() == 1) {
+                            throw new Exception("В программе отсутствуют используемые переменные");
+                        }
+                        grandparent.getChilds().remove(parent);
+                    }
+                }
+            }
+            i++;
+        }
+        return success;
+    }
+
+    private void deleteNterm(TreeItem Nterm) throws Exception {
+        TreeItem parent = Nterm.getParent();
+        TreeItem lastItem = parent.getChilds().get(parent.getChilds().size() - 1);
+        if (lastItem.getVal().getName().equals("раздел описания")) {
+            parent.setChilds(lastItem.getChilds());
+        } else {
+            parent.getParent().getChilds().remove(parent);
         }
     }
 }

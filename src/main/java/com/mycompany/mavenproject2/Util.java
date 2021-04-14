@@ -15,7 +15,7 @@ import java.io.PrintStream;
 public class Util {
 
     public static void main(String[] args) throws UnsupportedEncodingException, Exception {
-        String pascalFile = "program6.txt";
+        String pascalFile = "deadcode.pas";
         PrintStream ps = new PrintStream(System.out, false, "utf-8");
         LexAnalyzer pascalLexAnal = new LexAnalyzer(pascalFile);
         try {
