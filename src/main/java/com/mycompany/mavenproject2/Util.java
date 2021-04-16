@@ -28,16 +28,22 @@ public class Util {
             pascalSynAnal.makeTable();
             //pascalSynAnal.printTable();
             pascalSynAnal.parse();
-            //pascalSynAnal.printParse();
+            pascalSynAnal.printParse();
             pascalSynAnal.buildTree();
-            SemAnalyzer pascalSemAnal = new SemAnalyzer(pascalSynAnal.getTree());
+            SemAnalyzer pascalSemAnal = new SemAnalyzer(
+                    pascalSynAnal.getTree(),
+                    pascalLexAnal.getListLexem()
+            );
             pascalSemAnal.makeAnalysis();
             if (!pascalSemAnal.hasError()) {
                 CGrammar cGrammar = new CGrammar(new Pair("nterm", "программа"));
                 //cGrammar.print();
-                Translator pascalToC = new Translator(cGrammar,
-                        pascalSynAnal.getParse(),
-                        pascalLexAnal.getListLexem());
+                Translator pascalToC = new Translator(
+                        cGrammar, 
+                        pascalGrammar,
+                        pascalSemAnal.getTree(),
+                        pascalLexAnal.getListLexem()
+                );
                 pascalToC.translate("program.cpp");
             }
         } catch (Exception e) {

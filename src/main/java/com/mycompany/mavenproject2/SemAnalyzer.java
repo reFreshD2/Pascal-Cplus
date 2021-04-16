@@ -21,9 +21,11 @@ public class SemAnalyzer {
     private PossibleOperationRepository repository = new PossibleOperationRepository();
     private final int COUNT_OF_VARIABLE = 255;
     private final int MAX_LENGTH_STRING = 255;
+    private ArrayList<Pair> lexems;
 
-    SemAnalyzer(ParseTree tree) {
+    SemAnalyzer(ParseTree tree, ArrayList<Pair> lexems) {
         this.tree = tree;
+        this.lexems = lexems;
         this.tableOfName = new ArrayList();
     }
 
@@ -383,6 +385,7 @@ public class SemAnalyzer {
                         this.tableOfName.get(i),
                         this.tree.getRoot().getChilds().get(0).getChilds()
                 );
+                this.lexems.remove(this.tableOfName.get(i));
             }
         }
         if (!out.isEmpty()) {
@@ -408,11 +411,11 @@ public class SemAnalyzer {
         boolean success = false;
         int i = 0;
         while (!success && i < varList.size()) {
-            if (varList.get(i).getVal().getName().equals("раздел описания")) {
-                success = deleteVar(var, varList.get(i).getChilds());;
-            }
-            if (varList.get(i).getVal().getName().equals("список имен")) {
-                success = deleteVar(var, varList.get(i).getChilds());;
+            if (varList.get(i).getVal().getName().equals("раздел описания") 
+                    || varList.get(i).getVal().getName().equals("список имен")) {
+                success = deleteVar(var, varList.get(i).getChilds());
+                i++;
+                continue;
             }
             if (varList.get(i).getVal().equals(var)) {
                 success = true;
@@ -424,12 +427,16 @@ public class SemAnalyzer {
                         }
                         varList.remove(i);
                     } else {
-                        TreeItem grandgrandparent = parent.getParent().getParent(); //подумать над логикой
-                        TreeItem lastItem = grandgrandparent.getChilds().get(grandgrandparent.getChilds().size()-1);
+                        TreeItem grandparent = parent.getParent(); 
+                        TreeItem lastItem = grandparent.getChilds().get(grandparent.getChilds().size()-1);
                         if (lastItem.getVal().getName().equals("раздел описания")) {
-                            parent.setChilds(lastItem.getChilds());
+                            grandparent.setChilds(lastItem.getChilds());
                         } else {
-                            parent.getParent().getChilds().remove(parent);
+                            TreeItem grandgrandparent = grandparent.getParent();
+                            if (grandparent.getVal().getName().equals("программа")) {
+                                throw new Exception("В программе отсутствуют используемые переменные");
+                            }
+                            grandgrandparent.getChilds().remove(grandparent);
                         }
                     }
                 }
@@ -439,8 +446,7 @@ public class SemAnalyzer {
                         parent.setChilds(lastItem.getChilds());
                     } else {
                         TreeItem grandparent = parent.getParent();
-                        if (grandparent.getVal().getName().equals("программа")
-                                && grandparent.getChilds().size() == 1) {
+                        if (grandparent.getVal().getName().equals("программа")) {
                             throw new Exception("В программе отсутствуют используемые переменные");
                         }
                         grandparent.getChilds().remove(parent);
@@ -451,14 +457,8 @@ public class SemAnalyzer {
         }
         return success;
     }
-
-    private void deleteNterm(TreeItem Nterm) throws Exception {
-        TreeItem parent = Nterm.getParent();
-        TreeItem lastItem = parent.getChilds().get(parent.getChilds().size() - 1);
-        if (lastItem.getVal().getName().equals("раздел описания")) {
-            parent.setChilds(lastItem.getChilds());
-        } else {
-            parent.getParent().getChilds().remove(parent);
-        }
+    
+    public ParseTree getTree() {
+        return this.tree;
     }
 }
