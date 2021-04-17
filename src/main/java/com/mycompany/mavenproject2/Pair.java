@@ -20,6 +20,7 @@ public class Pair {
     private String contextType = "";
     private String contextValue = "";
     private boolean inUse = false;
+    private int countOfLink = 0;
 
     Pair(String type, String name) {
         this.type = type;
@@ -46,6 +47,7 @@ public class Pair {
         copy.setContextType(this.contextType);
         copy.setContextValue(this.contextValue);
         copy.setInUse(this.inUse);
+        copy.setCountOfLink(this.countOfLink);
         return copy;
     }
 
@@ -104,6 +106,8 @@ public class Pair {
         this.numString = other.getNumString();
         this.type = other.getType();
         this.contextType = other.getContextType();
+        this.inUse = other.getInUse();
+        this.countOfLink = other.countOfLink;
     }
 
     public void setContextValue(String value) {
@@ -124,5 +128,13 @@ public class Pair {
     
     public void setNumString(int value) {
         this.numString = value;
+    }
+    
+    public void setCountOfLink(int count) {
+        this.countOfLink = count;
+    }
+    
+    public int getCountOfLink() {
+        return this.countOfLink;
     }
 }
