@@ -21,11 +21,10 @@ public class SemAnalyzer {
     private PossibleOperationRepository repository = new PossibleOperationRepository();
     private final int COUNT_OF_VARIABLE = 255;
     private final int MAX_LENGTH_STRING = 255;
-    private ArrayList<Pair> lexems;
 
-    SemAnalyzer(ParseTree tree, ArrayList<Pair> lexems) {
+
+    SemAnalyzer(ParseTree tree) {
         this.tree = tree;
-        this.lexems = lexems;
         this.tableOfName = new ArrayList();
     }
 
@@ -38,9 +37,6 @@ public class SemAnalyzer {
             validationString();
             ArrayList<Pair> scope = new ArrayList();
             validationBody(this.tree.getRoot().getChilds().get(1).getChilds().get(1).getChilds(), scope);
-            setCountOfLink(this.tree.getRoot().getChilds());
-            sendWarning();
-            deleteDeadCode();
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
@@ -377,27 +373,6 @@ public class SemAnalyzer {
         return isFind;
     }
 
-    private void sendWarning() throws UnsupportedEncodingException, Exception {
-        PrintStream ps = new PrintStream(System.out, false, "utf-8");
-        String out = "";
-        for (int i = 0; i < this.tableOfName.size(); i++) {
-            if (!this.tableOfName.get(i).getInUse()) {
-                out += "\'" + this.tableOfName.get(i).getName() + "\' ";
-                deleteVar(
-                        this.tableOfName.get(i),
-                        this.tree.getRoot().getChilds().get(0).getChilds()
-                );
-                this.removeLexems(this.tableOfName.get(i));
-            }
-        }
-        if (!out.isEmpty()) {
-            ps.println("[Warning] Объявлены неиспользуемые переменные "
-                    + out
-                    + ". Они были удалены."
-            );
-        }
-    }
-
     private void setUserValue(ArrayList<TreeItem> childs) {
         int i = 0;
         while (i < childs.size()) {
@@ -411,172 +386,8 @@ public class SemAnalyzer {
             i++;
         }
     }
-
-    private boolean deleteVar(Pair var, ArrayList<TreeItem> varList) throws Exception {
-        boolean success = false;
-        int i = 0;
-        while (!success && i < varList.size()) {
-            if (varList.get(i).getVal().getName().equals("раздел описания")
-                    || varList.get(i).getVal().getName().equals("список имен")) {
-                success = deleteVar(var, varList.get(i).getChilds());
-                i++;
-                continue;
-            }
-            if (varList.get(i).getVal().equals(var)) {
-                success = true;
-                TreeItem parent = varList.get(i).getParent();
-                if (parent.getVal().getName().equals("список имен")) {
-                    if (parent.getChilds().size() > 1) {
-                        if (i != parent.getChilds().size() - 1) {
-                            varList.remove(i + 1);
-                        }
-                        varList.remove(i);
-                    } else {
-                        TreeItem grandparent = parent.getParent();
-                        TreeItem lastItem = grandparent.getChilds().get(grandparent.getChilds().size() - 1);
-                        if (lastItem.getVal().getName().equals("раздел описания")) {
-                            grandparent.setChilds(lastItem.getChilds());
-                        } else {
-                            TreeItem grandgrandparent = grandparent.getParent();
-                            if (grandparent.getVal().getName().equals("программа")) {
-                                throw new Exception("В программе отсутствуют используемые переменные");
-                            }
-                            grandgrandparent.getChilds().remove(grandparent);
-                        }
-                    }
-                }
-                if (parent.getVal().getName().equals("раздел описания")) {
-                    TreeItem lastItem = varList.get(varList.size() - 1);
-                    if (lastItem.getVal().getName().equals("раздел описания")) {
-                        parent.setChilds(lastItem.getChilds());
-                    } else {
-                        TreeItem grandparent = parent.getParent();
-                        if (grandparent.getVal().getName().equals("программа")) {
-                            throw new Exception("В программе отсутствуют используемые переменные");
-                        }
-                        grandparent.getChilds().remove(parent);
-                    }
-                }
-            }
-            i++;
-        }
-        return success;
-    }
-
-    public ParseTree getTree() {
-        return this.tree;
-    }
-
-    private void setCountOfLink(ArrayList<TreeItem> childs) {
-        for (int i = 0; i < childs.size(); i++) {
-            Pair current = childs.get(i).getVal();
-            if (current.getType().equals("id")
-                    && (childs.get(i).getParent().getVal().getName().equals("операнд F")
-                    || childs.get(i).getParent().getVal().getName().equals("цикл for")
-                    || childs.get(i).getParent().getVal().getName().equals("ветвление case"))) {
-                Pair var = this.findByName(current.getName());
-                var.setCountOfLink(var.getCountOfLink() + 1);
-            }
-            if (current.getType().equals("nterm")) {
-                if (current.getName().equals("ввод/вывод")
-                        && (childs.get(i).getChilds().get(0).getVal().getName().equals("write")
-                        || childs.get(i).getChilds().get(0).getVal().getName().equals("writeln"))) {
-                    setCountOfLinkReс(childs.get(i).getChilds().get(2).getChilds());
-                } else {
-                    setCountOfLink(childs.get(i).getChilds());
-                }
-            }
-        }
-    }
-
-    private void setCountOfLinkReс(ArrayList<TreeItem> childs) {
-        for (int i = 0; i < childs.size(); i++) {
-            if (childs.get(i).getVal().getType().equals("id")) {
-                Pair var = this.findByName(childs.get(i).getVal().getName());
-                var.setCountOfLink(var.getCountOfLink() + 1);
-            } else {
-                setCountOfLinkReс(childs.get(i).getChilds());
-            }
-        }
-    }
-
-    private void deleteDeadCode() throws Exception {
-        PrintStream ps = new PrintStream(System.out, false, "utf-8");
-        for (int i = 0; i < this.tableOfName.size(); i++) {
-            Pair current = this.tableOfName.get(i);
-            if (current.getCountOfLink() == 0 && current.getInUse() == true) {
-                this.deleteVar(
-                        current,
-                        this.tree.getRoot().getChilds().get(0).getChilds()
-                );
-                this.removeLexems(current);
-                this.deleteVarFromBody(
-                        current,
-                        this.tree.getRoot().getChilds().get(1).getChilds()
-                );
-                this.removeLexems(current);
-                ps.println("[Warning] Переменной \'"
-                        + current.getName()
-                        + "\' было присвоено значение, но оно нигде не использовалось. Она была удалена."
-                );
-            }
-        }
-    }
-
-    private void deleteVarFromBody(Pair var, ArrayList<TreeItem> childs) throws Exception {
-        for (int i = 0; i < childs.size(); i++) {
-            if (childs.get(i).getVal().getName().equals("присваивание")
-                    && childs.get(i).getChilds().get(0).getVal().equals(var)) {
-                TreeItem grandparent = childs.get(i).getParent().getParent();
-                if (grandparent.getVal().getName().equals("составной оператор")) {
-                    if (childs.size() == 1) {
-                        throw new Exception("Пустое тело!");
-                    }
-                    grandparent.getChilds().get(1).setChilds(childs.get(i + 1).getChilds());
-                } else {
-                    if (childs.size() == 1) {
-                        grandparent.getChilds().remove(childs.get(i));
-                    } else {
-                        grandparent.getChilds().get(1).setChilds(childs.get(i + 1).getChilds());
-                    }
-                }
-                this.resetLink();
-                setCountOfLink(this.tree.getRoot().getChilds());
-                deleteDeadCode();
-                return;
-            }
-            if (childs.get(i).getVal().getType().equals("nterm")) {
-                deleteVarFromBody(var, childs.get(i).getChilds());
-            }
-        }
-    }
-
-    private void resetLink() {
-        for (int i = 0; i < this.tableOfName.size(); i++) {
-            this.tableOfName.get(i).setCountOfLink(0);
-        }
-    }
-
-    private void removeLexems(Pair lexem) {
-        int i = 0;
-        boolean success = false;
-        while (!success && i < this.lexems.size()) {
-            if (this.lexems.get(i).equals(lexem)) {
-                success = true;
-                if (this.lexems.get(i + 1).getName().equals(",")) {
-                    this.lexems.remove(i + 1);
-                    this.lexems.remove(i);
-                } else {
-                    if (this.lexems.get(i - 1).getName().equals("var")) {
-                        i--;
-                    }
-                    while (!this.lexems.get(i).getName().equals(";")) {
-                        this.lexems.remove(i);
-                    }
-                    this.lexems.remove(i);
-                }
-            }
-            i++;
-        }
+    
+    public ArrayList<Pair> getTable() {
+        return this.tableOfName;
     }
 }
