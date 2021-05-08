@@ -15,7 +15,7 @@ import java.io.PrintStream;
 public class Util {
 
     public static void main(String[] args) throws UnsupportedEncodingException, Exception {
-        String pascalFile = "deadcode.pas";
+        String pascalFile = "circle.pas";
         PrintStream ps = new PrintStream(System.out, false, "utf-8");
         LexAnalyzer pascalLexAnal = new LexAnalyzer(pascalFile);
         try {
@@ -45,7 +45,7 @@ public class Util {
                         cGrammar, 
                         pascalGrammar,
                         optimizer.getTree(),
-                        pascalLexAnal.getListLexem()
+                        optimizer.getListLexem()
                 );
                 pascalToC.translate("program.cpp");
             }

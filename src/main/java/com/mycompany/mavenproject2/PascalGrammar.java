@@ -295,9 +295,11 @@ public class PascalGrammar implements GrammarInterface {
         right54.add(new Pair("keyword", "repeat"));
         right54.add(new Pair("nterm", "составной оператор"));
         right54.add(new Pair("separator", ";"));
+        right54.add(new Pair("keyword", "until"));
         right54.add(new Pair("bracket", "("));
         right54.add(new Pair("nterm", "булево выражение"));
         right54.add(new Pair("bracket", ")"));
+        right54.add(new Pair("separator", ";"));
         Rule r55 = new Rule(new Pair("nterm", "цикл repeat"), right54);
         this.rules.add(r55);
         ArrayList<Pair> right55 = new ArrayList();

@@ -20,4 +20,20 @@ public class ParseTree {
     public TreeItem getRoot() {
         return root;
     }
+    
+    public ArrayList<Pair> getLexem() {
+        ArrayList<Pair> lexems = new ArrayList();
+        return this.recLexem(this.root, lexems);
+    }
+    
+    private ArrayList<Pair> recLexem(TreeItem item, ArrayList<Pair> lexems) {
+        for (int i = 0; i < item.getChilds().size(); i++) {
+            if (item.getChilds().get(i).getVal().getType().equals("nterm")) {
+                lexems = recLexem(item.getChilds().get(i), lexems);
+                continue;
+            }
+            lexems.add(item.getChilds().get(i).getVal());
+        }
+        return lexems;
+    }
 }

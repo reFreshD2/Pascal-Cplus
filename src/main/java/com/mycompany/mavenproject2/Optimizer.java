@@ -28,6 +28,7 @@ public class Optimizer {
         deleteDeadCode();
         optimizeExpression(this.tree.getRoot().getChilds().get(1).getChilds().get(1).getChilds());
         sendWarning();
+        this.lexems = this.tree.getLexem();
     }
 
     private boolean deleteVar(Pair var, ArrayList<TreeItem> varList) throws Exception {
@@ -253,21 +254,82 @@ public class Optimizer {
             TreeItem current = childs.get(i);
             ArrayList<TreeItem> optimize = new ArrayList();
             if (current.getVal().getName().equals("цикл while")) {
-                optimize = getOptimize(current, "while"); // подумать над определением заменяемого выражения
+                optimize = getOptimize(current, "while");
                 if (optimize.size() > 0) {
                     for (int j = 0; j < optimize.size(); j++) {
+                        String systemVar = this.getSystemName();
                         TreeItem grand = current.getParent().getParent();
-                        TreeItem assigment = createAssigment(optimize.get(j)); 
-                        // добавить логику добавления в список лексем и перестройку дерева
+                        TreeItem assigment = createAssigment(optimize.get(j), systemVar);
+                        TreeItem expression = createExpression(systemVar);
+                        if (current.getChilds().get(2).getChilds().get(0).equals(optimize.get(j))) {
+                            current.getChilds().get(2).getChilds().remove(0);
+                            current.getChilds().get(2).getChilds().add(0, expression);
+                        } else {
+                            current.getChilds().get(2).getChilds().remove(2);
+                            current.getChilds().get(2).getChilds().add(2, expression);
+                        }
+                        expression.setParent(current.getChilds().get(2));
+                        assigment.setParent(grand);
+                        grand.getChilds().remove(0);
+                        grand.getChilds().add(0, assigment);
+                        TreeItem operator = new TreeItem(new Pair("nterm", "операторы"));
+                        grand.getChilds().add(operator);
+                        operator.setParent(grand);
+                        ArrayList<TreeItem> circle = new ArrayList();
+                        circle.add(current.getParent());
+                        current.getParent().setParent(operator);
+                        if (grand.getChilds().size() != 1) {
+                            circle.add(grand.getChilds().get(1));
+                            grand.getChilds().get(1).setParent(operator);
+                            grand.getChilds().remove(1);
+                        }
+                        operator.setChilds(circle);
+                        expression.getClass();
                     }
                 }
             }
-            // написать рекурсию и проверку репита
+            if (current.getVal().getName().equals("цикл repeat")) {
+                optimize = getOptimize(current, "repeat");
+                if (optimize.size() > 0) {
+                    for (int j = 0; j < optimize.size(); j++) {
+                        String systemVar = this.getSystemName();
+                        TreeItem grand = current.getParent().getParent();
+                        TreeItem assigment = createAssigment(optimize.get(j), systemVar);
+                        TreeItem expression = createExpression(systemVar);
+                        if (current.getChilds().get(5).getChilds().get(0).equals(optimize.get(j))) {
+                            current.getChilds().get(5).getChilds().remove(0);
+                            current.getChilds().get(5).getChilds().add(0, expression);
+                        } else {
+                            current.getChilds().get(5).getChilds().remove(2);
+                            current.getChilds().get(5).getChilds().add(2, expression);
+                        }
+                        expression.setParent(current.getChilds().get(5));
+                        assigment.setParent(grand);
+                        grand.getChilds().remove(0);
+                        grand.getChilds().add(0, assigment);
+                        TreeItem operator = new TreeItem(new Pair("nterm", "операторы"));
+                        grand.getChilds().add(operator);
+                        operator.setParent(grand);
+                        ArrayList<TreeItem> circle = new ArrayList();
+                        circle.add(current.getParent());
+                        current.getParent().setParent(operator);
+                        if (grand.getChilds().size() != 1) {
+                            circle.add(grand.getChilds().get(1));
+                            grand.getChilds().get(1).setParent(operator);
+                            grand.getChilds().remove(1);
+                        }
+                        operator.setChilds(circle);
+                        expression.getClass();
+                    }
+                }
+            }
+            if (current.getVal().getType().equals("nterm")) {
+                optimizeExpression(current.getChilds());
+            }
         }
     }
-    
+
     private ArrayList<TreeItem> getOptimize(TreeItem circle, String type) {
-        boolean result = true;
         ArrayList<TreeItem> optimize = new ArrayList();
         switch (type) {
             case "while": {
@@ -275,25 +337,52 @@ public class Optimizer {
                 ArrayList<Pair> varOfExpression2 = collectVar(circle.getChilds().get(2).getChilds().get(2), new ArrayList());
                 if (varOfExpression1.size() > 0) {
                     int i = 0;
+                    boolean result = true;
                     while (result && i < varOfExpression1.size()) {
                         result = !findVarAtBody(varOfExpression1.get(i), circle.getChilds().get(4).getChilds().get(1));
+                        i++;
                     }
-                    optimize.add(circle.getChilds().get(2).getChilds().get(0));
-                } else {
-                    optimize.add(circle.getChilds().get(2).getChilds().get(0));
+                    if (result && !isConst(circle.getChilds().get(2).getChilds().get(0))) {
+                        optimize.add(circle.getChilds().get(2).getChilds().get(0));
+                    }
                 }
                 if (varOfExpression2.size() > 0) {
                     int i = 0;
+                    boolean result = true;
                     while (result && i < varOfExpression2.size()) {
                         result = !findVarAtBody(varOfExpression2.get(i), circle.getChilds().get(4).getChilds().get(1));
+                        i++;
                     }
-                    optimize.add(circle.getChilds().get(2).getChilds().get(2));
-                } else {
-                    optimize.add(circle.getChilds().get(2).getChilds().get(2));
+                    if (result && !isConst(circle.getChilds().get(2).getChilds().get(2))) {
+                        optimize.add(circle.getChilds().get(2).getChilds().get(2));
+                    }
                 }
             }
             case "repeat": {
-                // написать кейс с репит
+                ArrayList<Pair> varOfExpression1 = collectVar(circle.getChilds().get(5).getChilds().get(0), new ArrayList());
+                ArrayList<Pair> varOfExpression2 = collectVar(circle.getChilds().get(5).getChilds().get(2), new ArrayList());
+                if (varOfExpression1.size() > 0) {
+                    int i = 0;
+                    boolean result = true;
+                    while (result && i < varOfExpression1.size()) {
+                        result = !findVarAtBody(varOfExpression1.get(i), circle.getChilds().get(1).getChilds().get(1));
+                        i++;
+                    }
+                    if (result && !isConst(circle.getChilds().get(5).getChilds().get(0))) {
+                        optimize.add(circle.getChilds().get(5).getChilds().get(0));
+                    }
+                }
+                if (varOfExpression2.size() > 0) {
+                    int i = 0;
+                    boolean result = true;
+                    while (result && i < varOfExpression2.size()) {
+                        result = !findVarAtBody(varOfExpression2.get(i), circle.getChilds().get(1).getChilds().get(1));
+                        i++;
+                    }
+                    if (result && !isConst(circle.getChilds().get(5).getChilds().get(2))) {
+                        optimize.add(circle.getChilds().get(5).getChilds().get(2));
+                    }
+                }
             }
         }
         return optimize;
@@ -316,26 +405,31 @@ public class Optimizer {
         boolean result = false;
         int i = 0;
         while (!result && i < container.getChilds().size()) {
-            if (container.getChilds().get(i).getVal().getType().equals("ntrem")) {
+            if (container.getChilds().get(i).getVal().getType().equals("nterm")) {
                 result = findVarAtBody(finding, container.getChilds().get(i));
+                i++;
                 continue;
             }
             if (container.getChilds().get(i).getVal().getType().equals("id")
-                    && container.getChilds().get(i).getVal().equals(container.getChilds().get(i).getVal())) {
+                    && container.getChilds().get(i).getVal().getName().equals(finding.getName())) {
                 result = true;
             }
+            i++;
         }
         return result;
     }
-    
-    private TreeItem createAssigment(TreeItem expression) {
+
+    private TreeItem createAssigment(TreeItem expression, String varName) {
         ArrayList<Pair> childs = new ArrayList();
-        childs.add(new Pair("id", getSystemName()));
+        childs.add(new Pair("id", varName));
         childs.add(new Pair("nterm", "знак присваивания"));
         childs.add(new Pair("nterm", "выражение"));
         childs.add(new Pair("separator", ";"));
         TreeItem assigment = new TreeItem(new Pair("nterm", "присваивание"));
+        ArrayList<Pair> assigmentMark = new ArrayList();
+        assigmentMark.add(new Pair("assignment", ":="));
         assigment.addChilds(childs);
+        assigment.getChilds().get(1).addChilds(assigmentMark);
         TreeItem newExpression = assigment.getChilds().get(2);
         newExpression.setChilds(expression.getChilds());
         for (int i = 0; i < expression.getChilds().size(); i++) {
@@ -344,13 +438,48 @@ public class Optimizer {
         this.tableOfName.add(assigment.getChilds().get(0).getVal());
         return assigment;
     }
-    
+
+    private TreeItem createExpression(String varName) {
+        TreeItem expression = new TreeItem(new Pair("nterm", "выражение"));
+        ArrayList<Pair> T = new ArrayList();
+        T.add(new Pair("nterm", "операнд T"));
+        expression.addChilds(T);
+        TreeItem treeT = expression.getChilds().get(0);
+        ArrayList<Pair> F = new ArrayList();
+        F.add(new Pair("nterm", "операнд F"));
+        treeT.addChilds(F);
+        TreeItem treeF = treeT.getChilds().get(0);
+        ArrayList<Pair> id = new ArrayList();
+        id.add(new Pair("id", varName));
+        treeF.addChilds(id);
+        return expression;
+    }
+
     private String getSystemName() {
         String prefix = "system__";
         int counter = 0;
-        while (findByName(prefix+counter) != null) {
+        while (findByName(prefix + counter) != null) {
             counter++;
         }
-        return prefix+counter;
+        return prefix + counter;
+    }
+
+    private boolean isConst(TreeItem expression) {
+        boolean result = true;
+        if (expression.getChilds().size() > 1) {
+            return false;
+        }
+        if (expression.getChilds().get(0).getVal().getType().equals("nterm")) {
+            result = isConst(expression.getChilds().get(0));
+        } else if (!expression.getChilds().get(0).getVal().getType().equals("number")
+                && !expression.getChilds().get(0).getVal().getType().equals("string")
+                && !expression.getChilds().get(0).getVal().getType().equals("id")) {
+            return false;
+        }
+        return result;
+    }
+   
+    public ArrayList<Pair> getListLexem() {
+        return this.lexems;
     }
 }
